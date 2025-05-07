@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Request\UploadTrackRequest;
+use App\Http\Requests\Track\UploadTrackRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\{Track, File, Genre};
@@ -21,7 +21,7 @@ class TrackController extends Controller
     public function store(UploadTrackRequest $request)
     {
         // Валидация данных
-        $validated = $request->validate();
+        $validated = $request->validated();
 
         // Обработка жанра - найти существующий или создать новый
         $genre = Genre::firstOrCreate(['name' => $validated['genre']]);
@@ -55,20 +55,5 @@ class TrackController extends Controller
 
         return redirect()->route('tracks.show', $track)
             ->with('success', 'Трек успешно загружен!');
-    }
-
-    /**
-     * Поиск жанров для автозаполнения
-     */
-    public function searchGenres(Request $request)
-    {
-        $query = $request->get('query');
-
-        $genres = Genre::where('name', 'like', "%{$query}%")
-            ->orderBy('name')
-            ->limit(10)
-            ->get();
-
-        return response()->json($genres);
     }
 }

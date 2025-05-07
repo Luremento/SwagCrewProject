@@ -58,4 +58,25 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(User::class, 'followers', 'follower_id', 'user_id');
     }
+
+    public function tracks()
+    {
+        return $this->hasMany(Track::class);
+    }
+
+        /**
+     * Get the contacts for the user.
+     */
+    public function contacts()
+    {
+        return $this->hasMany(Contact::class);
+    }
+
+    /**
+     * Get the social links for the user.
+     */
+    public function socialLinks()
+    {
+        return $this->hasMany(SocialLink::class);
+    }
 }

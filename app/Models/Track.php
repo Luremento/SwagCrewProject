@@ -8,7 +8,10 @@ class Track extends Model
 {
     protected $fillable = [
         'user_id',
-        'follower_id',
+        'file_id',
+        'genre_id',
+        'title',
+        'cover_image',
     ];
 
     /**

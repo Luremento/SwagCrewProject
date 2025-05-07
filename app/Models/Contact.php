@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SocialLink extends Model
+class Contact extends Model
 {
     protected $fillable = [
         'user_id',
-        'platform',
-        'url',
+        'type',
+        'value',
+        'is_public'
     ];
 }
