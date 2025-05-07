@@ -5,14 +5,30 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\{Auth, Redirect, Storage};
 use Illuminate\View\View;
+use App\Models\User;
 
 class ProfileController extends Controller
 {
+
+    public function index($user = null)
+    {
+        if ($user) {
+            $profileUser = User::where('id', $user)
+                            ->orWhere('name', $user)
+                            ->firstOrFail();
+        } else {
+            $profileUser = Auth::user();
+        }
+
+        return view('profile', [
+            'user' => $profileUser
+        ]);
+    }
+
     /**
-     * Display the user's profile form.
+     * отображение страницы редактирования профиля
      */
     public function edit(Request $request): View
     {
@@ -37,24 +53,24 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
+    public function uploadAvatar(Request $request)
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
+        $request->validate([
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
         ]);
 
-        $user = $request->user();
+        $user = auth()->user();
 
-        Auth::logout();
+        if ($user->avatar) {
+            Storage::disk('public')->delete('avatars/' . $user->avatar);
+        }
 
-        $user->delete();
+        $filename = uniqid() . '.' . $request->avatar->extension();
+        $request->file('avatar')->storeAs('avatars', $filename, 'public');
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $user->avatar = $filename;
+        $user->save();
 
-        return Redirect::to('/');
+        return redirect()->back()->with('success', 'Аватар успешно обновлен.');
     }
 }
