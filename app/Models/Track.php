@@ -7,11 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Track extends Model
 {
     protected $fillable = [
-        'user_id',
-        'file_id',
-        'genre_id',
-        'title',
-        'cover_image',
+        'user_id', 'file_id', 'genre_id', 'title', 'cover_image',
     ];
 
     /**
@@ -25,9 +21,9 @@ class Track extends Model
     /**
      * Получить файл трека
      */
-    public function file()
+    public function files()
     {
-        return $this->belongsTo(File::class);
+        return $this->morphMany(File::class, 'fileable');
     }
 
     /**

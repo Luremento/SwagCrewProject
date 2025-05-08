@@ -11,10 +11,17 @@ class File extends Model
         'path',
         'hash',
         'size',
+        'fileable_id',
+        'fileable_type',
     ];
 
     public function track()
     {
         return $this->hasOne(Track::class);
+    }
+
+    public function fileable()
+    {
+        return $this->morphTo();
     }
 }

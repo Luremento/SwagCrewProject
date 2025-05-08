@@ -5,13 +5,19 @@ use App\Http\Controllers\{
     MainController,
     FollowerController,
     TrackController,
-    GenreController
+    GenreController,
+    ForumTopicController,
+    ThreadController
 };
 use Illuminate\Support\Facades\Route;
 
 Route::controller(MainController::class)->group(function () {
     Route::get('/', 'index')->name('index');
 });
+Route::get('/forum', [ForumTopicController::class, 'index'])->name('forum.index');
+Route::get('/thread/create', [ThreadController::class, 'create'])->name('thread.create');
+Route::post('/thread', [ThreadController::class, 'store'])->name('thread.store');
+Route::get('/thread/{thread}', [ThreadController::class, 'show'])->name('thread.show');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -24,10 +30,11 @@ Route::middleware('auth')->group(function () {
 
 
     Route::controller(TrackController::class)->group(function () {
+        Route::get('/theme/track/search', 'search')->name('track.search');
         Route::get('/track/create', 'create')->name('track.create');
         Route::post('/tracks', 'store')->name('tracks.store');
-        Route::get('/tracks/{track}', 'show')->name('tracks.show');
         Route::get('/genres/search', 'searchGenres')->name('genres.search');
+        Route::get('/tracks/{track}', 'show')->name('tracks.show');
     });
 
     Route::get('/genres/search', [GenreController::class, 'search'])->name('genres.search');

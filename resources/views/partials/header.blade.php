@@ -19,7 +19,7 @@
                 <a href="/" class="text-primary-600 dark:text-primary-400 font-medium">Главная</a>
                 <a href="/"
                     class="text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400">Треки</a>
-                <a href="/"
+                <a href="{{ route('forum.index') }}"
                     class="text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400">Форум</a>
                 <a href="/"
                     class="text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400">Категории</a>

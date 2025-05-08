@@ -23,7 +23,7 @@ class TrackController extends Controller
         // Валидация данных
         $validated = $request->validated();
 
-        // Обработка жанра - найти существующий или создать новый
+        // Обработка жанра
         $genre = Genre::firstOrCreate(['name' => $validated['genre']]);
 
         // Обработка аудио файла
@@ -47,13 +47,51 @@ class TrackController extends Controller
         // Создание трека
         $track = Track::create([
             'user_id' => Auth::id(),
-            'file_id' => $file->id,
             'genre_id' => $genre->id,
             'title' => $validated['title'],
             'cover_image' => $coverPath,
         ]);
 
+        // Привязка файла к треку через полиморфную связь
+        $track->files()->create([
+            'original_name' => $audioFile->getClientOriginalName(),
+            'path' => $audioPath,
+            'hash' => md5_file($audioFile->getRealPath()),
+            'size' => $audioFile->getSize(),
+        ]);
+
         return redirect()->route('tracks.show', $track)
             ->with('success', 'Трек успешно загружен!');
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+
+        // Валидация
+        $request->validate([
+            'query' => 'required|string|min:2|max:100',
+        ]);
+
+        // Поиск треков
+        $tracks = Track::where('title', 'like', "%{$query}%")
+            ->orWhereHas('user', function($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%");
+            })
+            ->with('user') // Подгружаем связанного пользователя
+            ->limit(10)
+            ->get();
+
+        return response()->json([
+            'tracks' => $tracks->map(function($track) {
+                return [
+                    'id' => $track->id,
+                    'title' => $track->title,
+                    'artist' => $track->user->name,
+                    'cover' => $track->cover_image ?? '/images/default-cover.jpg',
+                    'url' => $track->file_url,
+                ];
+            })
+        ]);
     }
 }
