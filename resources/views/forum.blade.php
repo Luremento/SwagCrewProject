@@ -87,8 +87,13 @@
                         @foreach ($themes as $item)
                             <div class="flex items-center px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50">
                                 <div class="mr-4 flex-shrink-0">
-                                    <img src="{{ asset('storage/avatars/' . $item->user->avatar) }}" alt="Аватар"
-                                        class="h-10 w-10 rounded-full">
+                                    @if ($item->user->avatar)
+                                        <img src="{{ asset('storage/avatars/' . $item->user->avatar) }}" alt="Аватар"
+                                            class="h-10 w-10 rounded-full">
+                                    @else
+                                        <img src="{{ asset('img/default-avatar.webp') }}" alt="Аватар"
+                                            class="h-10 w-10 rounded-full">
+                                    @endif
                                 </div>
                                 <div class="min-w-0 flex-1">
                                     <div class="flex items-center justify-between">

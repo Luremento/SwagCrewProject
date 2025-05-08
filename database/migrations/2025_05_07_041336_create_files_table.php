@@ -18,8 +18,7 @@ return new class extends Migration
             $table->string('hash')->unique();
             $table->unsignedBigInteger('size');
 
-            // Полиморфные поля для связи с другими моделями
-            $table->morphs('fileable');  // Создаст два поля: fileable_id и fileable_type
+            $table->morphs('fileable');
             $table->timestamps();
         });
     }

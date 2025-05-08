@@ -37,6 +37,6 @@ class Thread extends Model
 
     public function comments()
     {
-        return $this->hasMany(Comment::class, 'threads_id');
+        return $this->hasMany(Comment::class, 'thread_id');
     }
 }

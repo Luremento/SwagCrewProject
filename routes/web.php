@@ -7,7 +7,8 @@ use App\Http\Controllers\{
     TrackController,
     GenreController,
     ForumTopicController,
-    ThreadController
+    ThreadController,
+    CommentController
 };
 use Illuminate\Support\Facades\Route;
 
@@ -38,6 +39,8 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::get('/genres/search', [GenreController::class, 'search'])->name('genres.search');
+
+    Route::post('/comment', [CommentController::class, 'store'])->name('comments.store');
 
     Route::post('/follow/{user}', [FollowerController::class, 'follow'])->name('follow');
     Route::delete('/unfollow/{user}', [FollowerController::class, 'unfollow'])->name('unfollow');

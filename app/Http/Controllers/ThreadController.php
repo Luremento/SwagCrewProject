@@ -80,8 +80,6 @@ class ThreadController extends Controller
             ->with('success', 'Тема успешно создана!');
     }
 
-
-
     /**
      * Отображение темы
      *
@@ -90,9 +88,9 @@ class ThreadController extends Controller
      */
     public function show($id)
     {
-        $thread = Thread::with(['user', 'category', 'files', 'track', 'comments.user', 'comments.files', 'comments.track'])
+        $thread = Thread::with(['user', 'tags', 'category', 'files', 'track', 'comments.user', 'comments.files', 'comments.track'])
             ->findOrFail($id);
 
-        return view('forum-show', compact('thread'));
+        return view('threads.show', compact('thread'));
     }
 }
