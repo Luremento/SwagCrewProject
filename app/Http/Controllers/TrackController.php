@@ -31,14 +31,6 @@ class TrackController extends Controller
         $audioFileName = Str::uuid() . '.' . $audioFile->getClientOriginalExtension();
         $audioPath = $audioFile->storeAs('tracks', $audioFileName, 'public');
 
-        // Создание записи файла
-        $file = File::create([
-            'original_name' => $audioFile->getClientOriginalName(),
-            'path' => $audioPath,
-            'hash' => md5_file($audioFile->getRealPath()),
-            'size' => $audioFile->getSize(),
-        ]);
-
         // Обработка обложки
         $coverImage = $request->file('cover_image');
         $coverFileName = Str::uuid() . '.' . $coverImage->getClientOriginalExtension();

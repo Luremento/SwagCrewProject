@@ -66,21 +66,20 @@ class ThreadController extends Controller
             foreach ($request->file('files') as $file) {
                 $path = $file->store('thread_files', 'public');
 
-                $threadFile = File::create([
+                // Создаем файл через полиморфную связь
+                $thread->files()->create([
                     'original_name' => $file->getClientOriginalName(),
                     'path' => $path,
                     'hash' => $file->hashName(),
                     'size' => $file->getSize(),
                 ]);
-
-                // Связываем файл с темой
-                $thread->files()->attach($threadFile);
             }
         }
 
         return redirect()->route('forum.show', $thread->id)
             ->with('success', 'Тема успешно создана!');
     }
+
 
 
     /**
