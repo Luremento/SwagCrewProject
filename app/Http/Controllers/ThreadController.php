@@ -82,9 +82,6 @@ class ThreadController extends Controller
 
     /**
      * Отображение темы
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
