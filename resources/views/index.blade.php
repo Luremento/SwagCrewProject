@@ -56,14 +56,14 @@
                     </div>
                     <div class="relative hidden lg:block">
                         <div class="relative mx-auto aspect-square max-w-md overflow-hidden rounded-2xl shadow-2xl">
-                            <img src="https://via.placeholder.com/600x600" alt="Музыкальная платформа"
+                            <img src="{{ asset('storage/' . $track->cover_image) }}" alt="Музыкальная платформа"
                                 class="h-full w-full object-cover">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                             <div class="absolute bottom-0 left-0 right-0 p-6">
                                 <div class="flex items-center justify-between">
                                     <div>
-                                        <h3 class="text-xl font-bold text-white">Новые горизонты</h3>
-                                        <p class="text-sm text-white/80">Александр Иванов</p>
+                                        <h3 class="text-xl font-bold text-white">{{ $track->title }}</h3>
+                                        <p class="text-sm text-white/80">{{ $track->user->name }}</p>
                                     </div>
                                     <button
                                         class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-600/90 text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-primary-600">
@@ -383,7 +383,7 @@
         </div>
     </div>
 
-    <!-- Категории -->
+    {{-- <!-- Категории -->
     <div class="mt-20">
         <div class="mb-10 flex flex-wrap items-center justify-between gap-4">
             <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
@@ -456,7 +456,7 @@
                 </div>
             </a>
         </div>
-    </div>
+    </div> --}}
 
     <!-- Популярные обсуждения -->
     <div class="mt-20">
@@ -467,7 +467,7 @@
                     <span class="absolute -bottom-1 left-0 h-1 w-1/2 rounded bg-primary-500"></span>
                 </span>
             </h2>
-            <a href="/"
+            <a href="{{ route('forum.index') }}"
                 class="group flex items-center text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
                 <span>Смотреть все</span>
                 <svg xmlns="http://www.w3.org/2000/svg"
@@ -479,144 +479,66 @@
         </div>
 
         <div class="space-y-6">
-            <!-- Обсуждение 1 -->
-            <div
-                class="group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:bg-gray-800/80 dark:backdrop-blur-sm">
-                <div class="p-6">
-                    <div class="mb-4 flex items-center justify-between">
-                        <div class="flex items-center">
-                            <img src="https://via.placeholder.com/40" alt="Аватар" class="mr-3 h-10 w-10 rounded-full">
-                            <div>
-                                <a href="/"
-                                    class="font-medium text-gray-900 hover:text-primary-600 dark:text-white dark:hover:text-primary-400">Александр
-                                    Иванов</a>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Опубликовано 2 дня назад</p>
+            @foreach ($popularThreads as $item)
+                <div
+                    class="group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:bg-gray-800/80 dark:backdrop-blur-sm">
+                    <div class="p-6">
+                        <div class="mb-4 flex items-center justify-between">
+                            <div class="flex items-center">
+                                @if ($item->user->avatar)
+                                    <img src="{{ asset('storage/avatars/' . $item->user->avatar) }}" alt="Аватар"
+                                        class="mr-3 h-10 w-10 rounded-full">
+                                @else
+                                    <img src="{{ asset('img/default-avatar.webp') }}" alt="Аватар"
+                                        class="mr-3 h-10 w-10 rounded-full">
+                                @endif
+                                <div>
+                                    <a href="{{ route('profile.index', $item->user->id) }}"
+                                        class="font-medium text-gray-900 hover:text-primary-600 dark:text-white dark:hover:text-primary-400">{{ $item->user->name }}</a>
+                                </div>
                             </div>
-                        </div>
-                        <div
-                            class="flex items-center rounded-full bg-primary-50 px-3 py-1 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                            </svg>
-                            <span class="text-sm font-medium">Обсуждение</span>
-                        </div>
-                    </div>
-                    <h3 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">
-                        <a href="/" class="hover:text-primary-600 dark:hover:text-primary-400">Какое оборудование
-                            лучше для домашней студии?</a>
-                    </h3>
-                    <p class="mb-4 text-gray-600 line-clamp-2 dark:text-gray-400">
-                        Хочу собрать домашнюю студию для записи вокала и гитары. Какие микрофоны, аудиоинтерфейсы и мониторы
-                        посоветуете? Бюджет ограничен, но хочется получить достойное качество звука.
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        <span
-                            class="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300">Оборудование</span>
-                        <span
-                            class="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300">Студия</span>
-                        <span
-                            class="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300">Запись</span>
-                    </div>
-                    <div class="mt-6 flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="flex items-center text-gray-500 dark:text-gray-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-5 w-5" fill="none"
+                            <div
+                                class="flex items-center rounded-full bg-primary-50 px-3 py-1 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                                 </svg>
-                                <span class="text-sm font-medium">1.2K</span>
-                            </div>
-                            <div class="flex items-center text-gray-500 dark:text-gray-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-5 w-5" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                                </svg>
-                                <span class="text-sm font-medium">86</span>
+                                <span class="text-sm font-medium">{{ $item->category->name }}</span>
                             </div>
                         </div>
-                        <a href="/"
-                            class="rounded-full bg-primary-50 px-4 py-2 text-sm font-medium text-primary-600 transition-colors hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50">
-                            Присоединиться
-                        </a>
+                        <h3 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">
+                            <a href="{{ route('thread.show', $item->id) }}"
+                                class="hover:text-primary-600 dark:hover:text-primary-400">{{ $item->title }}</a>
+                        </h3>
+                        <p class="mb-4 text-gray-600 line-clamp-2 dark:text-gray-400">
+                            {{ $item->content }}
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach ($item->tags as $tag)
+                                <span
+                                    class="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300">{{ $tag->name }}</span>
+                            @endforeach
+                        </div>
+                        <div class="mt-6 flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="flex items-center text-gray-500 dark:text-gray-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-5 w-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                    </svg>
+                                    <span class="text-sm font-medium">{{ $item->comments_count }}</span>
+                                </div>
+                            </div>
+                            <a href="{{ route('thread.show', $item->id) }}"
+                                class="rounded-full bg-primary-50 px-4 py-2 text-sm font-medium text-primary-600 transition-colors hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50">
+                                Присоединиться
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Обсуждение 2 -->
-            <div
-                class="group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:bg-gray-800/80 dark:backdrop-blur-sm">
-                <div class="p-6">
-                    <div class="mb-4 flex items-center justify-between">
-                        <div class="flex items-center">
-                            <img src="https://via.placeholder.com/40" alt="Аватар" class="mr-3 h-10 w-10 rounded-full">
-                            <div>
-                                <a href="/"
-                                    class="font-medium text-gray-900 hover:text-primary-600 dark:text-white dark:hover:text-primary-400">Мария
-                                    Петрова</a>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Опубликовано 5 дней назад</p>
-                            </div>
-                        </div>
-                        <div
-                            class="flex items-center rounded-full bg-primary-50 px-3 py-1 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                            </svg>
-                            <span class="text-sm font-medium">Обсуждение</span>
-                        </div>
-                    </div>
-                    <h3 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">
-                        <a href="/" class="hover:text-primary-600 dark:hover:text-primary-400">Какие VST-плагины
-                            лучше для электронной музыки?</a>
-                    </h3>
-                    <p class="mb-4 text-gray-600 line-clamp-2 dark:text-gray-400">
-                        Ищу хорошие VST-инструменты и эффекты для создания электронной музыки. Интересуют как бесплатные
-                        варианты, так и платные. Какие плагины вы используете и можете порекомендовать?
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        <span
-                            class="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300">VST</span>
-                        <span
-                            class="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300">Электронная
-                            музыка</span>
-                        <span
-                            class="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300">Продакшн</span>
-                    </div>
-                    <div class="mt-6 flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="flex items-center text-gray-500 dark:text-gray-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-5 w-5" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                                <span class="text-sm font-medium">2.4K</span>
-                            </div>
-                            <div class="flex items-center text-gray-500 dark:text-gray-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-5 w-5" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                                </svg>
-                                <span class="text-sm font-medium">124</span>
-                            </div>
-                        </div>
-                        <a href="/"
-                            class="rounded-full bg-primary-50 px-4 py-2 text-sm font-medium text-primary-600 transition-colors hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50">
-                            Присоединиться
-                        </a>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 
