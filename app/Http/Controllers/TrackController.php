@@ -11,6 +11,12 @@ use Illuminate\Support\Facades\{Auth, Storage};
 
 class TrackController extends Controller
 {
+    public function index() {
+        $genres = Genre::all();
+        $tracks = Track::all();
+        return view('tracks', compact('genres', 'tracks'));
+    }
+
     public function create() {
         return view('track.upload');
     }

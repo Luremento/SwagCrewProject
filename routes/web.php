@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
 
 
     Route::controller(TrackController::class)->group(function () {
+        Route::get('/tracks', 'index')->name('tracks.index');
         Route::get('/theme/track/search', 'search')->name('track.search');
         Route::get('/track/create', 'create')->name('track.create');
         Route::post('/tracks', 'store')->name('tracks.store');

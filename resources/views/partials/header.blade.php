@@ -16,16 +16,20 @@
 
             <!-- Навигация для десктопа -->
             <nav class="hidden md:flex md:items-center md:space-x-6">
-                <a href="/" class="text-primary-600 dark:text-primary-400 font-medium">Главная</a>
-                <a href="/"
-                    class="text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400">Треки</a>
+                <a href="{{ route('index') }}"
+                    class="{{ request()->routeIs('index') ? 'text-primary-600 dark:text-primary-400 font-medium' : 'text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400' }}">
+                    Главная
+                </a>
+
+                <a href="{{ url('/') }}"
+                    class="{{ request()->is('/') ? 'text-primary-600 dark:text-primary-400 font-medium' : 'text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400' }}">
+                    Треки
+                </a>
+
                 <a href="{{ route('forum.index') }}"
-                    class="text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400">Форум</a>
-                <a href="/"
-                    class="text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400">Категории</a>
-                <a href="/"
-                    class="text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400">О
-                    нас</a>
+                    class="{{ request()->routeIs('forum.index') ? 'text-primary-600 dark:text-primary-400 font-medium' : 'text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400' }}">
+                    Форум
+                </a>
             </nav>
 
             <!-- Правая часть -->

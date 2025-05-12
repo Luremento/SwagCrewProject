@@ -26,8 +26,15 @@ class ProfileController extends Controller
             $profileUser = Auth::user();
         }
 
+        $topTopics = $profileUser->threads()
+        ->withCount('comments')
+        ->orderByDesc('comments_count')
+        ->take(3)
+        ->get();
+
         return view('profile', [
-            'user' => $profileUser
+            'user' => $profileUser,
+            'topTopics' => $topTopics
         ]);
     }
 

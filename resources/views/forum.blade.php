@@ -47,8 +47,8 @@
                     </div>
                     <div class="divide-y divide-gray-200 dark:divide-gray-700">
                         @foreach ($categories as $item)
-                            <a href="#"
-                                class="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <a href="{{ route('forum.index', ['category_id' => $item->id]) }}"
+                                class="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 {{ request('category_id') == $item->id ? 'bg-gray-100 dark:bg-gray-700/30' : '' }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="mr-3 h-5 w-5 text-primary-500" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -68,15 +68,19 @@
                 <!-- Заголовок и фильтры (только для десктопа) -->
                 <div class="hidden items-center justify-between lg:flex">
                     <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Форум музыкантов</h1>
-                    <div class="flex items-center gap-3">
-                        <select
+                    <form method="GET" action="{{ route('forum.index') }}">
+                        {{-- Сохраняем выбранную категорию, если есть --}}
+                        @if (request('category_id'))
+                            <input type="hidden" name="category_id" value="{{ request('category_id') }}">
+                        @endif
+
+                        <select name="sort" onchange="this.form.submit()"
                             class="rounded-lg border border-gray-200 bg-gray-50 p-2 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                            <option value="latest">Новые темы</option>
-                            <option value="popular">Популярные</option>
-                            <option value="most_viewed">Самые просматриваемые</option>
-                            <option value="most_commented">Самые обсуждаемые</option>
+                            <option value="latest" {{ request('sort') === 'latest' ? 'selected' : '' }}>Новые темы</option>
+                            <option value="most_commented" {{ request('sort') === 'most_commented' ? 'selected' : '' }}>
+                                Самые обсуждаемые</option>
                         </select>
-                    </div>
+                    </form>
                 </div>
 
                 <!-- Список тем -->
@@ -141,7 +145,8 @@
                             <span class="sr-only">Предыдущая</span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 19l-7-7 7-7" />
                             </svg>
                         </a>
                         <a href="#"

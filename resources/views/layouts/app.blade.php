@@ -29,7 +29,7 @@
     <div class="flex flex-col min-h-screen">
         @include('partials.header')
 
-        <main class="flex-grow container mx-auto px-4 py-8">
+        <main class="flex-grow container mx-auto px-4 py-4">
             @yield('content')
         </main>
 

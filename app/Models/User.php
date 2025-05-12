@@ -64,7 +64,12 @@ class User extends Authenticatable
         return $this->hasMany(Track::class);
     }
 
-        /**
+    public function threads()
+    {
+        return $this->hasMany(Thread::class);
+    }
+
+    /**
      * Get the contacts for the user.
      */
     public function contacts()

@@ -22,6 +22,9 @@
 
     $tracksCount = $user->tracks->count();
     $tracksLabel = pluralRussian($tracksCount, 'трек', 'трека', 'треков');
+
+    $threadsCount = $user->threads->count();
+    $threadsLabel = pluralRussian($threadsCount, 'тема', 'темы', 'тем');
 @endphp
 
 @section('title', 'Профиль пользователя')
@@ -166,8 +169,12 @@
             </div>
             <div
                 class="flex flex-col items-center rounded-xl bg-gray-50 p-4 transition-all duration-300 hover:bg-gray-100 dark:bg-gray-700/50 dark:hover:bg-gray-700">
-                <div class="text-3xl font-bold text-primary-600 dark:text-primary-400">18</div>
-                <div class="text-sm font-medium text-gray-600 dark:text-gray-400">Тем на форуме</div>
+                <div class="text-3xl font-bold text-primary-600 dark:text-primary-400">
+                    {{ $threadsCount }}
+                </div>
+                <div class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                    {{ $threadsLabel }} на форуме
+                </div>
             </div>
         </div>
 
@@ -385,148 +392,67 @@
                 </h2>
 
                 <div class="space-y-4">
-                    @php
-                        $topics = [
-                            [
-                                'title' => 'Как создать глубокий бас в техно-треках?',
-                                'category' => 'Продакшн',
-                                'replies' => '24',
-                                'views' => '342',
-                                'date' => '15.04.2023',
-                                'is_pinned' => true,
-                            ],
-                            [
-                                'title' => 'Обзор нового синтезатора Model X',
-                                'category' => 'Оборудование',
-                                'replies' => '18',
-                                'views' => '256',
-                                'date' => '02.04.2023',
-                                'is_pinned' => false,
-                            ],
-                            [
-                                'title' => 'Ищу музыкантов для совместного проекта',
-                                'category' => 'Коллаборации',
-                                'replies' => '32',
-                                'views' => '478',
-                                'date' => '28.03.2023',
-                                'is_pinned' => false,
-                            ],
-                            [
-                                'title' => 'Как продвигать свою музыку в 2023 году',
-                                'category' => 'Маркетинг',
-                                'replies' => '45',
-                                'views' => '612',
-                                'date' => '15.03.2023',
-                                'is_pinned' => false,
-                            ],
-                            [
-                                'title' => 'Лучшие плагины для мастеринга',
-                                'category' => 'Продакшн',
-                                'replies' => '29',
-                                'views' => '387',
-                                'date' => '05.03.2023',
-                                'is_pinned' => false,
-                            ],
-                        ];
-                    @endphp
-
-                    @foreach ($topics as $topic)
+                    @foreach ($topTopics as $item)
                         <div
-                            class="group rounded-xl bg-white p-5 shadow-md transition-all duration-300 hover:shadow-lg dark:bg-gray-800/80 dark:backdrop-blur-sm">
-                            <div class="flex flex-wrap items-center justify-between gap-4">
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-2">
-                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                                            <a href="#" class="hover:text-primary-600 dark:hover:text-primary-400">
-                                                {{ $topic['title'] }}
-                                            </a>
-                                        </h3>
-                                        @if ($topic['is_pinned'])
-                                            <span
-                                                class="inline-flex items-center rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900/30 dark:text-primary-300">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-3 w-3"
-                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                                                </svg>
-                                                Закреплено
-                                            </span>
+                            class="group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:bg-gray-800/80 dark:backdrop-blur-sm">
+                            <div class="p-6">
+                                <div class="mb-4 flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        @if ($item->user->avatar)
+                                            <img src="{{ asset('storage/avatars/' . $item->user->avatar) }}"
+                                                alt="Аватар" class="mr-3 h-10 w-10 rounded-full">
+                                        @else
+                                            <img src="{{ asset('img/default-avatar.webp') }}" alt="Аватар"
+                                                class="mr-3 h-10 w-10 rounded-full">
                                         @endif
+                                        <div>
+                                            <a href="{{ route('profile.index', $item->user->id) }}"
+                                                class="font-medium text-gray-900 hover:text-primary-600 dark:text-white dark:hover:text-primary-400">{{ $item->user->name }}</a>
+                                        </div>
                                     </div>
-                                    <div class="mt-1 flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
-                                        <span
-                                            class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                                            {{ $topic['category'] }}
-                                        </span>
-                                        <span>{{ $topic['date'] }}</span>
+                                    <div
+                                        class="flex items-center rounded-full bg-primary-50 px-3 py-1 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                        </svg>
+                                        <span class="text-sm font-medium">{{ $item->category->name }}</span>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-6">
-                                    <div class="flex items-center gap-1 text-gray-500 dark:text-gray-400">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                                        </svg>
-                                        <span class="text-sm">{{ $topic['replies'] }}</span>
+                                <h3 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">
+                                    <a href="{{ route('thread.show', $item->id) }}"
+                                        class="hover:text-primary-600 dark:hover:text-primary-400">{{ $item->title }}</a>
+                                </h3>
+                                <p class="mb-4 text-gray-600 line-clamp-2 dark:text-gray-400">
+                                    {{ $item->content }}
+                                </p>
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach ($item->tags as $tag)
+                                        <span
+                                            class="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300">{{ $tag->name }}</span>
+                                    @endforeach
+                                </div>
+                                <div class="mt-6 flex items-center justify-between">
+                                    <div class="flex items-center gap-4">
+                                        <div class="flex items-center text-gray-500 dark:text-gray-400">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-5 w-5" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                            </svg>
+                                            <span class="text-sm font-medium">{{ $item->comments_count }}</span>
+                                        </div>
                                     </div>
-                                    <div class="flex items-center gap-1 text-gray-500 dark:text-gray-400">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                        <span class="text-sm">{{ $topic['views'] }}</span>
-                                    </div>
+                                    <a href="{{ route('thread.show', $item->id) }}"
+                                        class="rounded-full bg-primary-50 px-4 py-2 text-sm font-medium text-primary-600 transition-colors hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50">
+                                        Присоединиться
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     @endforeach
                 </div>
-            </div>
-
-            <!-- Пагинация -->
-            <div class="mt-10 flex justify-center">
-                <nav class="inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                    <a href="#"
-                        class="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700">
-                        <span class="sr-only">Предыдущая</span>
-                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                            aria-hidden="true">
-                            <path fill-rule="evenodd"
-                                d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </a>
-                    <a href="#" aria-current="page"
-                        class="relative z-10 inline-flex items-center border border-primary-500 bg-primary-50 px-4 py-2 text-sm font-medium text-primary-600 dark:border-primary-500 dark:bg-primary-900/30 dark:text-primary-200">
-                        1
-                    </a>
-                    <a href="#"
-                        class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700">
-                        2
-                    </a>
-                    <a href="#"
-                        class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700">
-                        3
-                    </a>
-                    <span
-                        class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                        ...
-                    </span>
-                    <a href="#"
-                        class="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700">
-                        <span class="sr-only">Следующая</span>
-                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                            aria-hidden="true">
-                            <path fill-rule="evenodd"
-                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </a>
-                </nav>
             </div>
         </div>
     </div>

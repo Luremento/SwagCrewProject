@@ -103,58 +103,60 @@
                 <!-- Прикрепленный трек -->
                 @if ($thread->track)
                     <div
-                        class="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
-                        <div class="flex items-center">
-                            <div class="mr-4 flex-shrink-0">
-                                <div class="relative h-16 w-16 overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
-                                    @if ($thread->track->cover_image)
-                                        <img src="{{ asset('storage/' . $thread->track->cover_image) }}" alt="Обложка трека"
-                                            class="h-full w-full object-cover">
-                                    @else
-                                        <div
-                                            class="flex h-full w-full items-center justify-center bg-gray-300 dark:bg-gray-600">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-500"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                                            </svg>
-                                        </div>
-                                    @endif
+                        class="mb-6 overflow-hidden rounded-lg border border-gray-200 bg-gradient-to-r from-gray-50 to-white p-4 shadow-sm dark:border-gray-700 dark:from-gray-800/80 dark:to-gray-800/60 dark:backdrop-blur-sm">
+                        <div class="flex flex-col sm:flex-row sm:items-center">
+                            <div
+                                class="relative mb-4 mr-0 h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-gray-200 shadow-md dark:bg-gray-700 sm:mb-0 sm:mr-5 sm:h-28 sm:w-28">
+                                @if ($thread->track->cover_image)
+                                    <img src="{{ asset('storage/' . $thread->track->cover_image) }}" alt="Обложка трека"
+                                        class="h-full w-full object-cover">
+                                @else
+                                    <div
+                                        class="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-300 to-gray-200 dark:from-gray-600 dark:to-gray-700">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-500"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                                        </svg>
+                                    </div>
+                                @endif
+                                <button data-track-id="{{ $thread->track->id }}"
+                                    class="play-button absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 opacity-0 transition-all duration-200 hover:bg-opacity-60 hover:opacity-100">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white drop-shadow-lg"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="mb-1 text-xl font-bold text-gray-900 dark:text-white">
+                                    {{ $thread->track->title }}</h3>
+                                <p class="mb-3 text-sm text-gray-600 dark:text-gray-300">{{ $thread->track->user->name }}
+                                </p>
+                                <div class="flex items-center">
                                     <button data-track-id="{{ $thread->track->id }}"
-                                        class="play-button absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity hover:opacity-100">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none"
+                                        class="play-button mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 text-white shadow-md transition-all hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                     </button>
-                                </div>
-                            </div>
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ $thread->track->title }}
-                                </h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ $thread->track->user->name }}</p>
-                                <div class="mt-2 flex items-center">
-                                    <div class="flex items-center">
-                                        <button data-track-id="{{ $thread->track->id }}"
-                                            class="play-button mr-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                        </button>
-                                        <div class="w-48 rounded-full bg-gray-200 dark:bg-gray-700">
+                                    <div class="flex-1">
+                                        <div
+                                            class="mb-1 h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                                             <div
-                                                class="h-1.5 w-0 rounded-full bg-primary-600 dark:bg-primary-500 progress-bar">
+                                                class="h-full w-0 rounded-full bg-primary-600 dark:bg-primary-500 progress-bar">
                                             </div>
                                         </div>
-                                        <span class="ml-2 text-xs text-gray-500 dark:text-gray-400 track-time">0:00 /
-                                            0:00</span>
+                                        <div class="flex justify-between">
+                                            <span class="text-xs text-gray-500 dark:text-gray-400 track-time">0:00</span>
+                                            <span
+                                                class="text-xs text-gray-500 dark:text-gray-400 track-duration">0:00</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -165,71 +167,92 @@
                 <!-- Прикрепленные файлы -->
                 @if ($thread->files && $thread->files->count() > 0)
                     <div
-                        class="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
-                        <h3 class="mb-3 text-sm font-medium text-gray-900 dark:text-white">Прикрепленные файлы:</h3>
-                        <div class="space-y-2">
+                        class="mb-6 rounded-lg border border-gray-200 bg-gray-50/50 p-4 backdrop-blur-sm dark:border-gray-700/50 dark:bg-gray-800/30">
+                        <h3 class="mb-3 flex items-center text-sm font-medium text-gray-900 dark:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                            </svg>
+                            Прикрепленные файлы
+                        </h3>
+                        <div class="grid gap-2 sm:grid-cols-2">
                             @foreach ($thread->files as $file)
-                                <div class="flex items-center rounded-lg bg-white p-2 dark:bg-gray-700">
-                                    @php
-                                        $extension = pathinfo($file->original_name, PATHINFO_EXTENSION);
-                                        $icon = 'document';
+                                @php
+                                    $extension = pathinfo($file->original_name, PATHINFO_EXTENSION);
+                                    $icon = 'document';
+                                    $bgColor = 'bg-gray-100';
+                                    $iconColor = 'text-gray-500';
 
-                                        if (in_array($extension, ['mp3', 'wav', 'ogg'])) {
-                                            $icon = 'music';
-                                        } elseif (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
-                                            $icon = 'image';
-                                        } elseif (in_array($extension, ['zip', 'rar'])) {
-                                            $icon = 'archive';
-                                        } elseif (in_array($extension, ['pdf'])) {
-                                            $icon = 'pdf';
-                                        }
-                                    @endphp
+                                    if (in_array($extension, ['mp3', 'wav', 'ogg'])) {
+                                        $icon = 'music';
+                                        $bgColor = 'bg-purple-100';
+                                        $iconColor = 'text-purple-500';
+                                    } elseif (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
+                                        $icon = 'image';
+                                        $bgColor = 'bg-blue-100';
+                                        $iconColor = 'text-blue-500';
+                                    } elseif (in_array($extension, ['zip', 'rar'])) {
+                                        $icon = 'archive';
+                                        $bgColor = 'bg-amber-100';
+                                        $iconColor = 'text-amber-500';
+                                    } elseif (in_array($extension, ['pdf'])) {
+                                        $icon = 'pdf';
+                                        $bgColor = 'bg-red-100';
+                                        $iconColor = 'text-red-500';
+                                    }
+                                @endphp
 
-                                    @if ($icon == 'music')
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="mr-2 h-5 w-5 text-gray-500 dark:text-gray-400" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                                        </svg>
-                                    @elseif ($icon == 'image')
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="mr-2 h-5 w-5 text-gray-500 dark:text-gray-400" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                    @elseif ($icon == 'archive')
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="mr-2 h-5 w-5 text-gray-500 dark:text-gray-400" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                                        </svg>
-                                    @elseif ($icon == 'pdf')
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="mr-2 h-5 w-5 text-gray-500 dark:text-gray-400" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                        </svg>
-                                    @else
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="mr-2 h-5 w-5 text-gray-500 dark:text-gray-400" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                    @endif
-
-                                    <span
-                                        class="mr-2 text-sm text-gray-700 dark:text-gray-300">{{ $file->original_name }}</span>
-                                    <span
-                                        class="text-xs text-gray-500 dark:text-gray-400">({{ number_format($file->size / 1024, 1) }}
-                                        KB)</span>
+                                <div
+                                    class="flex items-center rounded-lg bg-white p-3 shadow-sm transition-all hover:shadow-md dark:bg-gray-700">
+                                    <div
+                                        class="mr-3 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full {{ $bgColor }} dark:bg-opacity-20">
+                                        @if ($icon == 'music')
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="h-5 w-5 {{ $iconColor }} dark:text-opacity-80" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                                            </svg>
+                                        @elseif ($icon == 'image')
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="h-5 w-5 {{ $iconColor }} dark:text-opacity-80" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                        @elseif ($icon == 'archive')
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="h-5 w-5 {{ $iconColor }} dark:text-opacity-80" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                                            </svg>
+                                        @elseif ($icon == 'pdf')
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="h-5 w-5 {{ $iconColor }} dark:text-opacity-80" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                            </svg>
+                                        @else
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="h-5 w-5 {{ $iconColor }} dark:text-opacity-80" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                        @endif
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="truncate text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            {{ $file->original_name }}</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ number_format($file->size / 1024, 1) }} KB</p>
+                                    </div>
                                     <a href="{{ asset('storage/' . $file->path) }}"
                                         download="{{ $file->original_name }}"
-                                        class="ml-auto rounded-full p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white">
+                                        class="ml-2 flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -290,49 +313,66 @@
 
         <!-- Комментарии -->
         <div class="mt-8">
-            <h2 class="mb-6 text-xl font-bold text-gray-900 dark:text-white">
-                Комментарии ({{ $thread->comments->count() }})
+            <h2 class="mb-4 flex items-center text-xl font-bold text-gray-900 dark:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5 text-gray-600 dark:text-gray-400"
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                </svg>
+                Комментарии <span
+                    class="ml-2 rounded-full bg-gray-100 px-2.5 py-0.5 text-sm text-gray-700 dark:bg-gray-700 dark:text-gray-300">{{ $thread->comments->count() }}</span>
             </h2>
 
-            <div class="space-y-6">
+            <div class="space-y-4">
                 <!-- Комментарии -->
                 @foreach ($thread->comments as $comment)
-                    <div class="rounded-xl bg-white p-6 shadow-lg dark:bg-gray-800/80 dark:backdrop-blur-sm">
+                    <div
+                        class="rounded-lg bg-white p-4 shadow-sm transition-all hover:shadow-md dark:bg-gray-800/80 dark:backdrop-blur-sm">
                         <div class="mb-2 flex items-center justify-between">
                             <div class="flex items-center">
                                 @if ($comment->user->avatar)
-                                    <img src="{{ asset('storage/avatars/' . $thread->user->avatar) }}" alt="Аватар"
-                                        class="mr-3 h-10 w-10 rounded-full">
+                                    <img src="{{ asset('storage/avatars/' . $comment->user->avatar) }}" alt="Аватар"
+                                        class="mr-3 h-8 w-8 rounded-full border-2 border-white shadow-sm dark:border-gray-700">
                                 @else
                                     <img src="{{ asset('img/default-avatar.webp') }}" alt="Аватар"
-                                        class="mr-3 h-10 w-10 rounded-full">
+                                        class="mr-3 h-8 w-8 rounded-full border-2 border-white shadow-sm dark:border-gray-700">
                                 @endif
                                 <div>
                                     <a href="#"
-                                        class="font-medium text-gray-900 hover:text-primary-600 dark:text-white dark:hover:text-primary-400">
+                                        class="text-sm font-medium text-gray-900 hover:text-primary-600 dark:text-white dark:hover:text-primary-400">
                                         {{ $comment->user->name }}
                                     </a>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
                                         {{ $comment->created_at->diffForHumans() }}</p>
                                 </div>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button
+                                    class="rounded-full p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+                                    </svg>
+                                </button>
                             </div>
                         </div>
 
                         <!-- Прикрепленный трек в комментарии -->
                         @if ($comment->track)
                             <div
-                                class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-700">
+                                class="mb-3 rounded-lg border border-gray-200 bg-gray-50/50 p-2 dark:border-gray-700 dark:bg-gray-700/50">
                                 <div class="flex items-center">
-                                    <div class="mr-3 flex-shrink-0">
+                                    <div class="mr-2 flex-shrink-0">
                                         <div
-                                            class="relative h-12 w-12 overflow-hidden rounded-md bg-gray-200 dark:bg-gray-600">
+                                            class="relative h-10 w-10 overflow-hidden rounded-md bg-gray-200 dark:bg-gray-600">
                                             @if ($comment->track->cover_image)
                                                 <img src="{{ asset('storage/' . $comment->track->cover_image) }}"
                                                     alt="Обложка трека" class="h-full w-full object-cover">
                                             @else
                                                 <div
                                                     class="flex h-full w-full items-center justify-center bg-gray-300 dark:bg-gray-600">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500"
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500"
                                                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2"
@@ -342,7 +382,7 @@
                                             @endif
                                             <button data-track-id="{{ $comment->track->id }}"
                                                 class="play-button absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity hover:opacity-100">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white"
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white"
                                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -352,173 +392,157 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <div>
-                                        <h4 class="text-sm font-medium text-gray-900 dark:text-white">
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="truncate text-xs font-medium text-gray-900 dark:text-white">
                                             {{ $comment->track->title }}</h4>
                                         <p class="text-xs text-gray-500 dark:text-gray-400">
                                             {{ $comment->track->user->name }}</p>
                                         <div class="mt-1 flex items-center">
                                             <button data-track-id="{{ $comment->track->id }}"
-                                                class="play-button mr-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                                                class="play-button mr-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                                     viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                                                 </svg>
                                             </button>
-                                            <div class="w-32 rounded-full bg-gray-200 dark:bg-gray-600">
+                                            <div class="w-24 rounded-full bg-gray-200 dark:bg-gray-600">
                                                 <div
                                                     class="h-1 w-0 rounded-full bg-primary-600 dark:bg-primary-500 progress-bar">
                                                 </div>
                                             </div>
-                                            <span class="ml-2 text-xs text-gray-500 dark:text-gray-400 track-time">0:00 /
-                                                0:00</span>
+                                            <span
+                                                class="ml-1 text-xs text-gray-500 dark:text-gray-400 track-time">0:00</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         @endif
 
-                        <div class="prose max-w-none dark:prose-invert">
+                        <div class="prose prose-sm max-w-none dark:prose-invert">
                             {!! $comment->content !!}
                         </div>
 
-                        <!-- Прикрепленные файлы в комментарии -->
+                        <!-- Прикрепленные файлы в комментарии (улучшенный вид) -->
                         @if ($comment->files && $comment->files->count() > 0)
                             <div
-                                class="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-700 space-y-2">
+                                class="mt-3 flex flex-wrap gap-2 rounded border border-gray-200 bg-gray-50/50 p-2 dark:border-gray-700 dark:bg-gray-700/50">
                                 @foreach ($comment->files as $file)
-                                    <div class="flex items-center rounded-lg bg-white p-2 dark:bg-gray-600">
-                                        @php
-                                            $extension = pathinfo($file->original_name, PATHINFO_EXTENSION);
-                                            $icon = 'document';
+                                    @php
+                                        $extension = pathinfo($file->original_name, PATHINFO_EXTENSION);
+                                        $icon = 'document';
+                                        $bgColor = 'bg-gray-100';
+                                        $iconColor = 'text-gray-500';
 
-                                            if (in_array($extension, ['mp3', 'wav', 'ogg'])) {
-                                                $icon = 'music';
-                                            } elseif (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
-                                                $icon = 'image';
-                                            } elseif (in_array($extension, ['zip', 'rar'])) {
-                                                $icon = 'archive';
-                                            } elseif (in_array($extension, ['pdf'])) {
-                                                $icon = 'pdf';
-                                            }
-                                        @endphp
+                                        if (in_array($extension, ['mp3', 'wav', 'ogg'])) {
+                                            $icon = 'music';
+                                            $bgColor = 'bg-purple-100';
+                                            $iconColor = 'text-purple-500';
+                                        } elseif (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
+                                            $icon = 'image';
+                                            $bgColor = 'bg-blue-100';
+                                            $iconColor = 'text-blue-500';
+                                        } elseif (in_array($extension, ['zip', 'rar'])) {
+                                            $icon = 'archive';
+                                            $bgColor = 'bg-amber-100';
+                                            $iconColor = 'text-amber-500';
+                                        } elseif (in_array($extension, ['pdf'])) {
+                                            $icon = 'pdf';
+                                            $bgColor = 'bg-red-100';
+                                            $iconColor = 'text-red-500';
+                                        }
+                                    @endphp
 
+                                    <a href="{{ asset('storage/' . $file->path) }}"
+                                        download="{{ $file->original_name }}"
+                                        class="flex items-center rounded-full {{ $bgColor }} px-3 py-1 text-xs font-medium {{ $iconColor }} transition-all hover:shadow-sm dark:bg-opacity-20 dark:text-opacity-90">
                                         @if ($icon == 'music')
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                class="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" fill="none"
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-3 w-3" fill="none"
                                                 viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                                             </svg>
                                         @elseif ($icon == 'image')
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                class="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" fill="none"
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-3 w-3" fill="none"
                                                 viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                             </svg>
                                         @elseif ($icon == 'archive')
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                class="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" fill="none"
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-3 w-3" fill="none"
                                                 viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                                             </svg>
                                         @elseif ($icon == 'pdf')
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                class="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" fill="none"
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-3 w-3" fill="none"
                                                 viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                             </svg>
                                         @else
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                class="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" fill="none"
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-3 w-3" fill="none"
                                                 viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                             </svg>
                                         @endif
-
-                                        <span
-                                            class="mr-2 text-xs text-gray-700 dark:text-gray-300">{{ $file->original_name }}</span>
-                                        <span
-                                            class="text-xs text-gray-500 dark:text-gray-400">({{ number_format($file->size / 1024, 1) }}
-                                            KB)</span>
-                                        <a href="{{ asset('storage/' . $file->path) }}"
-                                            download="{{ $file->original_name }}"
-                                            class="ml-auto rounded-full p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-500 dark:hover:text-white">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                            </svg>
-                                        </a>
-                                    </div>
+                                        {{ Str::limit($file->original_name, 15) }}
+                                    </a>
                                 @endforeach
                             </div>
                         @endif
                     </div>
                 @endforeach
 
-                <!-- Форма добавления комментария -->
-                <div class="rounded-xl bg-white p-6 shadow-lg dark:bg-gray-800/80 dark:backdrop-blur-sm">
-                    <h3 class="mb-4 text-lg font-bold text-gray-900 dark:text-white">Добавить комментарий</h3>
-                    <form action="{{ route('comments.store') }}" method="POST" enctype="multipart/form-data">
+                <!-- Форма добавления комментария (улучшенная) -->
+                <div class="sticky bottom-0 rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800/90 dark:backdrop-blur-sm">
+                    <form action="{{ route('comments.store') }}" method="POST" enctype="multipart/form-data"
+                        class="space-y-2">
                         @csrf
                         <input type="hidden" name="thread_id" value="{{ $thread->id }}">
 
-                        <div class="mb-4">
-                            <textarea name="content" rows="4"
-                                class="block w-full rounded-lg border border-gray-200 bg-white p-4 text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                        <div class="flex items-center gap-2">
+                            <textarea name="content" rows="1"
+                                class="flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                                 placeholder="Напишите ваш комментарий..." required></textarea>
-                            @error('content')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
+
+                            <button type="submit"
+                                class="rounded-lg bg-primary-600 px-3 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-primary-700 hover:shadow focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-700 dark:hover:bg-primary-600 dark:focus:ring-primary-800">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                </svg>
+                            </button>
                         </div>
 
-                        <!-- Прикрепить трек к комментарию -->
-                        <div class="mb-4">
+                        <div class="flex items-center gap-2">
+                            <!-- Прикрепить трек к комментарию -->
                             <button type="button" id="attach-track-btn"
-                                class="flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5" fill="none"
+                                class="flex items-center rounded-lg border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 hover:shadow dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-3.5 w-3.5" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                                 </svg>
-                                Прикрепить трек
+                                Трек
                             </button>
                             <input type="hidden" name="track_id" id="comment-track-id">
-                            <div id="selected-track-container" class="mt-2 hidden"></div>
-                            @error('track_id')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
+                            <div id="selected-track-container" class="hidden"></div>
 
-                        <!-- Прикрепить файлы к комментарию -->
-                        <div class="mb-4">
+                            <!-- Прикрепить файлы к комментарию -->
                             <label for="comment-files"
-                                class="flex cursor-pointer items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5" fill="none"
+                                class="flex items-center rounded-lg border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 hover:shadow dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-3.5 w-3.5" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                 </svg>
-                                Прикрепить файлы
+                                Файл
                             </label>
                             <input type="file" id="comment-files" name="files[]" multiple class="hidden">
-                            <div id="comment-files-list" class="mt-2 space-y-2 hidden"></div>
-                            @error('files.*')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="flex justify-end">
-                            <button type="submit"
-                                class="rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-700 dark:hover:bg-primary-600 dark:focus:ring-primary-800">
-                                Отправить комментарий
-                            </button>
+                            <div id="comment-files-list" class="hidden"></div>
                         </div>
                     </form>
                 </div>
@@ -526,227 +550,320 @@
         </div>
     </div>
 
+    <!-- Add this to your format-time.blade.php file, replacing the current track attachment functionality -->
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Аудио плеер
-            let currentAudio = null;
-            let currentPlayButton = null;
-            let currentProgressBar = null;
-            let currentTimeDisplay = null;
+            // Track attachment functionality for comments
+            const attachTrackBtn = document.getElementById('attach-track-btn');
+            const selectedTrackContainer = document.getElementById('selected-track-container');
+            const commentTrackId = document.getElementById('comment-track-id');
+            let searchTimeout;
 
-            // Функция для форматирования времени
-            function formatTime(seconds) {
-                const minutes = Math.floor(seconds / 60);
-                const secs = Math.floor(seconds % 60);
-                return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+            if (attachTrackBtn) {
+                attachTrackBtn.addEventListener('click', function() {
+                    // Create and show the search input and results container
+                    if (!document.getElementById('comment-track-search')) {
+                        const searchContainer = document.createElement('div');
+                        searchContainer.className = 'mt-2 space-y-2';
+                        searchContainer.innerHTML = `
+                        <div class="relative">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <input type="text" id="comment-track-search" class="block w-full rounded-lg border border-gray-200 bg-gray-50 p-2 pl-10 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white" placeholder="Поиск трека по названию...">
+                        </div>
+                        <div id="comment-track-results" class="hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+                            <div class="max-h-40 overflow-y-auto p-2">
+                                <!-- Results will appear here -->
+                            </div>
+                        </div>
+                    `;
+
+                        selectedTrackContainer.parentNode.insertBefore(searchContainer,
+                            selectedTrackContainer);
+
+                        const trackSearch = document.getElementById('comment-track-search');
+                        const trackResults = document.getElementById('comment-track-results');
+
+                        // Focus the search input
+                        trackSearch.focus();
+
+                        // Add event listener for search input
+                        trackSearch.addEventListener('input', function() {
+                            clearTimeout(searchTimeout);
+
+                            if (this.value.length > 2) {
+                                // Add delay to prevent too many requests
+                                searchTimeout = setTimeout(() => {
+                                    fetch(
+                                            `/theme/track/search?query=${encodeURIComponent(this.value)}`
+                                        )
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            // Clear current results
+                                            trackResults.querySelector('div')
+                                                .innerHTML = '';
+
+                                            if (data.tracks && data.tracks.length > 0) {
+                                                // Add new results
+                                                data.tracks.forEach(track => {
+                                                    const trackElement =
+                                                        document.createElement(
+                                                            'div');
+                                                    trackElement.className =
+                                                        'track-result cursor-pointer rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-700';
+                                                    trackElement.dataset.id =
+                                                        track.id;
+                                                    trackElement.dataset.title =
+                                                        track.title;
+                                                    trackElement.dataset
+                                                        .artist = track.artist;
+                                                    trackElement.dataset.cover =
+                                                        track.cover;
+
+                                                    const storageBaseUrl =
+                                                        "{{ asset('storage') }}";
+                                                    trackElement.innerHTML = `
+                                                    <div class="flex items-center">
+                                                        <div class="mr-2 h-8 w-8 flex-shrink-0 overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
+                                                            <img src="${storageBaseUrl + '/' + track.cover}" alt="Обложка трека" class="h-full w-full object-cover">
+                                                        </div>
+                                                        <div>
+                                                            <p class="text-xs font-medium text-gray-900 dark:text-white">${track.title}</p>
+                                                            <p class="text-xs text-gray-500 dark:text-gray-400">${track.artist}</p>
+                                                        </div>
+                                                    </div>
+                                                `;
+
+                                                    // Add click handler
+                                                    trackElement
+                                                        .addEventListener(
+                                                            'click',
+                                                            function() {
+                                                                selectCommentTrack
+                                                                    (this
+                                                                        .dataset
+                                                                        .id,
+                                                                        this
+                                                                        .dataset
+                                                                        .title,
+                                                                        this
+                                                                        .dataset
+                                                                        .artist,
+                                                                        this
+                                                                        .dataset
+                                                                        .cover);
+                                                            });
+
+                                                    trackResults.querySelector(
+                                                        'div').appendChild(
+                                                        trackElement);
+                                                });
+
+                                                trackResults.classList.remove('hidden');
+                                            } else {
+                                                // Show message if no tracks found
+                                                const noResults = document
+                                                    .createElement('div');
+                                                noResults.className =
+                                                    'p-2 text-center text-xs text-gray-500 dark:text-gray-400';
+                                                noResults.textContent =
+                                                    'Треки не найдены';
+                                                trackResults.querySelector('div')
+                                                    .appendChild(noResults);
+                                                trackResults.classList.remove('hidden');
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Ошибка при поиске треков:',
+                                                error);
+                                        });
+                                }, 300);
+                            } else {
+                                trackResults.classList.add('hidden');
+                            }
+                        });
+
+                        // Close results when clicking outside
+                        document.addEventListener('click', function(event) {
+                            const trackResults = document.getElementById('comment-track-results');
+                            const trackSearch = document.getElementById('comment-track-search');
+
+                            if (trackResults && trackSearch &&
+                                !trackSearch.contains(event.target) &&
+                                !trackResults.contains(event.target) &&
+                                !event.target.closest('#attach-track-btn')) {
+                                trackResults.classList.add('hidden');
+                            }
+                        });
+                    } else {
+                        // If search is already visible, just focus it
+                        document.getElementById('comment-track-search').focus();
+                    }
+                });
             }
 
-            // Функция для воспроизведения трека
-            function playTrack(trackId, button) {
-                // Если уже играет какой-то трек, останавливаем его
-                if (currentAudio) {
-                    currentAudio.pause();
-                    currentPlayButton.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    `;
-                }
+            // Function to select a track for comment
+            function selectCommentTrack(id, title, artist, cover) {
+                // Update hidden input with track ID
+                document.getElementById('comment-track-id').value = id;
 
-                // Если нажали на тот же трек, который уже играет, просто останавливаем
-                if (currentAudio && currentPlayButton === button) {
-                    currentAudio = null;
-                    currentPlayButton = null;
-                    return;
-                }
+                // Update selected track display
+                const selectedTrackContainer = document.getElementById('selected-track-container');
+                selectedTrackContainer.classList.remove('hidden');
 
-                // Находим ближайший прогресс-бар и дисплей времени
-                const container = button.closest('.flex');
-                const progressBar = container.querySelector('.progress-bar');
-                const timeDisplay = container.querySelector('.track-time');
+                const storageBaseUrl = "{{ asset('storage') }}";
+                selectedTrackContainer.innerHTML = `
+                <div class="mt-2 rounded-lg border border-gray-200 bg-gray-50 p-2 dark:border-gray-700 dark:bg-gray-800">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="mr-2 h-8 w-8 flex-shrink-0 overflow-hidden rounded bg-gray-200 dark:bg-gray-700">
+                                ${cover ? `<img src="${storageBaseUrl}/${cover}" alt="Обложка трека" class="h-full w-full object-cover">` :
+                                `<div class="flex h-full w-full items-center justify-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                                                    </svg>
+                                                </div>`}
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-gray-900 dark:text-white">${title}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">${artist}</p>
+                            </div>
+                        </div>
+                        <button type="button" id="remove-comment-track" class="flex h-6 w-6 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
 
-                // Создаем новый аудио элемент
-                const audio = new Audio(`/api/tracks/${trackId}/stream`);
+                // Remove search container
+                const searchContainer = document.getElementById('comment-track-search').parentNode.parentNode;
+                searchContainer.parentNode.removeChild(searchContainer);
 
-                audio.addEventListener('loadedmetadata', function() {
-                    if (timeDisplay) {
-                        timeDisplay.textContent = `0:00 / ${formatTime(audio.duration)}`;
-                    }
+                // Add event listener to remove button
+                document.getElementById('remove-comment-track').addEventListener('click', function() {
+                    selectedTrackContainer.classList.add('hidden');
+                    document.getElementById('comment-track-id').value = '';
                 });
-
-                audio.addEventListener('timeupdate', function() {
-                    if (progressBar) {
-                        const percent = (audio.currentTime / audio.duration) * 100;
-                        progressBar.style.width = `${percent}%`;
-                    }
-
-                    if (timeDisplay) {
-                        timeDisplay.textContent =
-                            `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
-                    }
-                });
-
-                audio.addEventListener('ended', function() {
-                    button.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    `;
-                    currentAudio = null;
-                    currentPlayButton = null;
-                });
-
-                // Запускаем воспроизведение
-                audio.play();
-
-                // Меняем иконку на паузу
-                button.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                `;
-
-                // Сохраняем текущий аудио и кнопку
-                currentAudio = audio;
-                currentPlayButton = button;
-                currentProgressBar = progressBar;
-                currentTimeDisplay = timeDisplay;
             }
 
-            // Находим все кнопки воспроизведения
-            const playButtons = document.querySelectorAll('.play-button');
-
-            // Добавляем обработчики событий
-            playButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const trackId = this.dataset.trackId;
-                    playTrack(trackId, this);
-                });
-            });
-
-            // Обработка загрузки файлов для комментария
+            // Fix for file attachment list to prevent form from becoming too large
             const commentFilesInput = document.getElementById('comment-files');
             const commentFilesList = document.getElementById('comment-files-list');
 
             if (commentFilesInput) {
                 commentFilesInput.addEventListener('change', function() {
-                    commentFilesList.innerHTML = '';
-
                     if (this.files.length > 0) {
-                        commentFilesList.classList.remove('hidden');
-
-                        for (let i = 0; i < this.files.length; i++) {
-                            const file = this.files[i];
-                            const fileItem = document.createElement('div');
-                            fileItem.className =
-                                'flex items-center justify-between rounded-lg bg-gray-50 p-2 dark:bg-gray-700';
-
-                            // Определяем иконку в зависимости от типа файла
-                            let fileIcon = `
-                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                            `;
-
-                            if (file.type.startsWith('audio/')) {
-                                fileIcon = `
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                                    </svg>
-                                `;
-                            } else if (file.type.startsWith('image/')) {
-                                fileIcon = `
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                `;
-                            }
-
-                            fileItem.innerHTML = `
-                                ${fileIcon}
-                                <span class="mr-2 text-sm text-gray-700 dark:text-gray-300">${file.name}</span>
-                                <span class="text-xs text-gray-500 dark:text-gray-400">(${(file.size / 1024).toFixed(1)} KB)</span>
-                                <button type="button" class="remove-file ml-auto rounded-full p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            `;
-
-                            commentFilesList.appendChild(fileItem);
-                        }
-
-                        // Добавляем обработчики для кнопок удаления
-                        const removeButtons = commentFilesList.querySelectorAll('.remove-file');
-                        removeButtons.forEach((button, index) => {
-                            button.addEventListener('click', function() {
-                                this.closest('div').remove();
-
-                                // Если все файлы удалены, скрываем список
-                                if (commentFilesList.children.length === 0) {
-                                    commentFilesList.classList.add('hidden');
-                                }
-                            });
-                        });
+                        showFilesList(this.files, commentFilesList);
                     } else {
                         commentFilesList.classList.add('hidden');
                     }
                 });
             }
 
-            // Обработка прикрепления трека к комментарию
-            // Обработка прикрепления трека к комментарию
-            const attachTrackBtn = document.getElementById('attach-track-btn');
-            if (attachTrackBtn) {
-                attachTrackBtn.addEventListener('click', function() {
-                    // Здесь можно реализовать модальное окно для выбора трека
-                    // Для примера просто эмулируем выбор трека
-                    const selectedTrack = {
-                        id: 1, // ID выбранного трека
-                        title: "Пример трека",
-                        artist: "Исполнитель",
-                        duration: "3:45"
-                    };
+            // Improved function for displaying file list with fixed height
+            function showFilesList(files, container) {
+                container.innerHTML = '';
+                container.classList.remove('hidden');
 
-                    const selectedTrackContainer = document.getElementById('selected-track-container');
-                    selectedTrackContainer.classList.remove('hidden');
-                    selectedTrackContainer.innerHTML = `
-            <div class="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-700">
-                <div class="flex items-center">
-                    <div class="mr-3 h-10 w-10 overflow-hidden rounded-md bg-gray-200 dark:bg-gray-600">
-                        <div class="flex h-full w-full items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                            </svg>
-                        </div>
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-gray-900 dark:text-white">${selectedTrack.title}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">${selectedTrack.artist} • ${selectedTrack.duration}</p>
-                    </div>
+                const fileListWrapper = document.createElement('div');
+                fileListWrapper.className =
+                    'mt-2 rounded-lg border border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800';
+
+                // Add a max-height with scrolling to prevent the form from becoming too large
+                if (files.length > 3) {
+                    fileListWrapper.classList.add('max-h-32', 'overflow-y-auto');
+                }
+
+                // Create a container for the files
+                const filesContainer = document.createElement('div');
+                filesContainer.className = 'p-2 space-y-2';
+                fileListWrapper.appendChild(filesContainer);
+
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const fileItem = createFileItem(file, i);
+                    filesContainer.appendChild(fileItem);
+                }
+
+                container.appendChild(fileListWrapper);
+
+                // Add a counter if there are many files
+                if (files.length > 3) {
+                    const fileCounter = document.createElement('div');
+                    fileCounter.className = 'text-xs text-gray-500 mt-1 text-right dark:text-gray-400';
+                    fileCounter.textContent = `Прикреплено файлов: ${files.length}`;
+                    container.appendChild(fileCounter);
+                }
+
+                // Add event listeners to remove buttons
+                const removeButtons = container.querySelectorAll('.remove-file');
+                removeButtons.forEach((button, index) => {
+                    button.addEventListener('click', function() {
+                        this.closest('.file-item').remove();
+
+                        // Update the counter
+                        const remainingFiles = filesContainer.querySelectorAll('.file-item').length;
+                        if (remainingFiles === 0) {
+                            container.classList.add('hidden');
+                        } else if (files.length > 3) {
+                            const counter = container.querySelector('.text-right');
+                            if (counter) {
+                                counter.textContent = `Прикреплено файлов: ${remainingFiles}`;
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Function to create a file item (compact version)
+            function createFileItem(file, index) {
+                const fileItem = document.createElement('div');
+                fileItem.className =
+                    'file-item flex items-center justify-between rounded-lg bg-white p-1.5 shadow-sm dark:bg-gray-700';
+
+                // Determine icon based on file type
+                let fileIcon = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+            `;
+
+                if (file.type.startsWith('audio/')) {
+                    fileIcon = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-purple-500 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
+                `;
+                } else if (file.type.startsWith('image/')) {
+                    fileIcon = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                `;
+                }
+
+                // Create a more compact file item
+                fileItem.innerHTML = `
+                <div class="flex items-center overflow-hidden">
+                    <span class="mr-1.5 flex-shrink-0">${fileIcon}</span>
+                    <span class="truncate text-xs font-medium text-gray-700 dark:text-gray-300">${file.name}</span>
+                    <span class="ml-1.5 flex-shrink-0 text-xs text-gray-500 dark:text-gray-400">(${(file.size / 1024).toFixed(1)} KB)</span>
                 </div>
-                <button type="button" id="remove-track-btn" class="rounded-full p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <button type="button" class="remove-file ml-1 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
-            </div>
-        `;
+            `;
 
-                    // Устанавливаем ID трека в скрытое поле
-                    document.getElementById('comment-track-id').value = selectedTrack.id;
-
-                    // Добавляем обработчик для кнопки удаления трека
-                    const removeTrackBtn = document.getElementById('remove-track-btn');
-                    if (removeTrackBtn) {
-                        removeTrackBtn.addEventListener('click', function() {
-                            selectedTrackContainer.classList.add('hidden');
-                            document.getElementById('comment-track-id').value = '';
-                        });
-                    }
-                });
+                return fileItem;
             }
         });
     </script>
