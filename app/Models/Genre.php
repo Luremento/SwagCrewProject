@@ -10,6 +10,9 @@ class Genre extends Model
         'name',
     ];
 
+    /**
+     * Получить треки, принадлежащие к этому жанру
+     */
     public function tracks()
     {
         return $this->hasMany(Track::class);

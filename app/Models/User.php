@@ -84,4 +84,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(SocialLink::class);
     }
+
+    /**
+     * Get the playlists for the user.
+     */
+    public function playlists()
+    {
+        return $this->hasMany(Playlist::class);
+    }
 }

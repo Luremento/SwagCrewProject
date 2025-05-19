@@ -41,4 +41,14 @@ class Track extends Model
     {
         return $this->belongsTo(Genre::class);
     }
+
+    /**
+     * The playlists that contain this track.
+     */
+    public function playlists(): BelongsToMany
+    {
+        return $this->belongsToMany(Playlist::class)
+            ->withPivot('position')
+            ->withTimestamps();
+    }
 }

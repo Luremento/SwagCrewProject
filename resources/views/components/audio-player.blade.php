@@ -1,186 +1,347 @@
-<div class="custom-audio-player rounded-lg bg-white shadow-sm dark:bg-gray-800">
-    <audio id="{{ $id ?? 'audio-player' }}" class="hidden">
-        <source src="{{ $src ?? '' }}" type="audio/mpeg">
-        Ваш браузер не поддерживает аудио элемент.
-    </audio>
-
-    <div class="flex items-center p-3">
-        <!-- Play/Pause Button -->
-        <button type="button"
-            class="play-pause-btn flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 text-white hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-800">
-            <svg xmlns="http://www.w3.org/2000/svg" class="play-icon h-5 w-5" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-            <svg xmlns="http://www.w3.org/2000/svg" class="pause-icon hidden h-5 w-5" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="6" y="4" width="4" height="16"></rect>
-                <rect x="14" y="4" width="4" height="16"></rect>
-            </svg>
-        </button>
-
-        <!-- Track Info -->
-        <div class="ml-3 flex-1">
-            <div class="flex items-center justify-between">
-                <div class="text-sm font-medium text-gray-900 dark:text-white">
-                    <span class="current-time">0:00</span>
-                    <span class="mx-1">/</span>
-                    <span class="duration">0:00</span>
+<!-- Плеер (фиксированный внизу экрана) -->
+<div id="audio-player" class="fixed bottom-0 left-0 right-0 hidden bg-white shadow-lg dark:bg-gray-800">
+    <div class="mx-auto max-w-7xl px-4 py-3">
+        <div class="flex items-center">
+            <div class="mr-4 flex items-center">
+                <div
+                    class="mr-3 h-12 w-12 flex-shrink-0 overflow-hidden rounded-md bg-gray-200 shadow-sm dark:bg-gray-700">
+                    <img id="player-cover" src="/placeholder.svg" alt="Обложка трека" class="h-full w-full object-cover">
                 </div>
-
-                <!-- Volume Control -->
-                <div class="flex items-center">
-                    <button type="button"
-                        class="volume-btn mr-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="volume-high h-5 w-5" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round">
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="volume-mute hidden h-5 w-5" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round">
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                            <line x1="23" y1="9" x2="17" y2="15"></line>
-                            <line x1="17" y1="9" x2="23" y2="15"></line>
-                        </svg>
-                    </button>
-                    <div class="volume-slider hidden w-20">
-                        <input type="range" min="0" max="100" value="100"
-                            class="h-1 w-full appearance-none rounded-full bg-gray-300 accent-primary-600 dark:bg-gray-600">
-                    </div>
+                <div>
+                    <p id="player-title" class="font-medium text-gray-900 dark:text-white">Название трека</p>
+                    <p id="player-artist" class="text-sm text-gray-500 dark:text-gray-400">Исполнитель</p>
                 </div>
             </div>
-
-            <!-- Progress Bar -->
-            <div class="progress-container mt-2 h-1.5 w-full cursor-pointer rounded-full bg-gray-200 dark:bg-gray-700">
-                <div class="progress-bar h-full rounded-full bg-primary-600 dark:bg-primary-500" style="width: 0%">
+            <div class="flex-1">
+                <div class="flex items-center justify-center">
+                    <button type="button" id="player-prev"
+                        class="mx-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12.066 11.2l5.334-3.2a1 1 0 000-1.8l-5.334-3.2a1 1 0 00-1.5.8v7.2a1 1 0 001.5.8z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5.866 11.2l5.334-3.2a1 1 0 000-1.8l-5.334-3.2a1 1 0 00-1.5.8v7.2a1 1 0 001.5.8z" />
+                        </svg>
+                    </button>
+                    <button type="button" id="player-play"
+                        class="mx-2 rounded-full bg-primary-600 p-2 text-white hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                        </svg>
+                    </button>
+                    <button type="button" id="player-next"
+                        class="mx-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M11.933 12.8l-5.334 3.2a1 1 0 01-1.5-.8V8a1 1 0 011.5-.8l5.334 3.2a1 1 0 010 1.6z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M18.133 12.8l-5.334 3.2a1 1 0 01-1.5-.8V8a1 1 0 011.5-.8l5.334 3.2a1 1 0 010 1.6z" />
+                        </svg>
+                    </button>
                 </div>
+                <div class="mt-2 flex items-center">
+                    <span id="player-current-time" class="mr-2 text-xs text-gray-500 dark:text-gray-400">0:00</span>
+                    <div class="flex-1">
+                        <div id="progress-container"
+                            class="h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700 cursor-pointer">
+                            <div id="player-progress" class="h-full rounded-full bg-primary-600 dark:bg-primary-500"
+                                style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <span id="player-duration" class="ml-2 text-xs text-gray-500 dark:text-gray-400">0:00</span>
+                </div>
+            </div>
+            <div class="ml-4 flex items-center">
+                <button type="button" id="player-volume"
+                    class="mx-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    </svg>
+                </button>
+                <button type="button" id="player-favorite"
+                    class="mx-2 text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                </button>
+                <button type="button" id="player-playlist"
+                    class="mx-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Инициализация всех аудио плееров на странице
-        document.querySelectorAll('.custom-audio-player').forEach(function(playerElement) {
-            initAudioPlayer(playerElement);
-        });
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Переменные для плеера
+            const audioPlayer = document.getElementById('audio-player');
+            const playerCover = document.getElementById('player-cover');
+            const playerTitle = document.getElementById('player-title');
+            const playerArtist = document.getElementById('player-artist');
+            const playerPlay = document.getElementById('player-play');
+            const playerProgress = document.getElementById('player-progress');
+            const playerCurrentTime = document.getElementById('player-current-time');
+            const playerDuration = document.getElementById('player-duration');
+            const playerPrev = document.getElementById('player-prev');
+            const playerNext = document.getElementById('player-next');
+            const audio = new Audio();
+            let isPlaying = false;
+            let currentTrackId = null;
+            let tracksList = [];
+            let currentTrackIndex = -1;
 
-        function initAudioPlayer(playerElement) {
-            const audio = playerElement.querySelector('audio');
-            const playPauseBtn = playerElement.querySelector('.play-pause-btn');
-            const playIcon = playerElement.querySelector('.play-icon');
-            const pauseIcon = playerElement.querySelector('.pause-icon');
-            const currentTimeEl = playerElement.querySelector('.current-time');
-            const durationEl = playerElement.querySelector('.duration');
-            const progressContainer = playerElement.querySelector('.progress-container');
-            const progressBar = playerElement.querySelector('.progress-bar');
-            const volumeBtn = playerElement.querySelector('.volume-btn');
-            const volumeHigh = playerElement.querySelector('.volume-high');
-            const volumeMute = playerElement.querySelector('.volume-mute');
-            const volumeSlider = playerElement.querySelector('.volume-slider');
-            const volumeRange = playerElement.querySelector('.volume-slider input');
+            // Функция для инициализации плейлиста
+            function initializePlaylist() {
+                // Очищаем текущий плейлист
+                tracksList = [];
 
-            // Инициализация
-            let isDragging = false;
+                // Собираем все треки на странице для создания плейлиста
+                const playButtons = document.querySelectorAll('.play-button');
+                playButtons.forEach(button => {
+                    if (button && button.getAttribute('data-track-id')) {
+                        const trackId = button.getAttribute('data-track-id');
+                        if (!tracksList.includes(trackId)) {
+                            tracksList.push(trackId);
+                        }
 
-            // Загрузка аудио
-            audio.addEventListener('loadedmetadata', function() {
-                durationEl.textContent = formatTime(audio.duration);
-            });
+                        // Добавляем обработчик события, если его еще нет
+                        if (!button.hasAttribute('data-initialized')) {
+                            button.setAttribute('data-initialized', 'true');
+                            button.addEventListener('click', function() {
+                                const trackId = this.getAttribute('data-track-id');
+                                if (trackId) {
+                                    playTrack(trackId);
+                                }
+                            });
+                        }
+                    }
+                });
 
-            // Обновление времени
-            audio.addEventListener('timeupdate', function() {
-                currentTimeEl.textContent = formatTime(audio.currentTime);
-                const percent = (audio.currentTime / audio.duration) * 100;
-                progressBar.style.width = `${percent}%`;
+                console.log('Плейлист инициализирован:', tracksList);
+            }
 
-                if (audio.ended) {
-                    playIcon.classList.remove('hidden');
-                    pauseIcon.classList.add('hidden');
+            // Инициализируем плейлист при загрузке страницы
+            initializePlaylist();
+
+            // Функция воспроизведения трека
+            function playTrack(trackId) {
+                if (!trackId) return;
+
+                // Если это тот же трек, просто переключаем воспроизведение/паузу
+                if (currentTrackId === trackId && audio.src) {
+                    togglePlayPause();
+                    return;
                 }
-            });
 
-            // Воспроизведение/пауза
-            playPauseBtn.addEventListener('click', function() {
-                if (audio.paused) {
-                    audio.play();
-                    playIcon.classList.add('hidden');
-                    pauseIcon.classList.remove('hidden');
-                } else {
+                currentTrackId = trackId;
+                currentTrackIndex = tracksList.indexOf(trackId);
+
+                // Получаем данные трека с сервера
+                fetch(`/tracks/${trackId}/data`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Ошибка при получении данных трека');
+                        }
+                        return response.json();
+                    })
+                    .then(trackData => {
+                        // Обновляем информацию в плеере
+                        if (playerCover) playerCover.src = trackData.cover || '/placeholder.svg';
+                        if (playerTitle) playerTitle.textContent = trackData.title;
+                        if (playerArtist) playerArtist.textContent = trackData.artist;
+
+                        // Показываем плеер
+                        if (audioPlayer) audioPlayer.classList.remove('hidden');
+
+                        // Настраиваем аудио
+                        audio.src = trackData.audio_url;
+                        audio.load();
+
+                        // Запускаем воспроизведение
+                        audio.play().then(() => {
+                            isPlaying = true;
+                            updatePlayButton();
+
+                            // Обновляем счетчик прослушиваний
+                            updatePlayCount(trackId);
+                        }).catch(error => {
+                            console.error('Ошибка воспроизведения:', error);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Ошибка:', error);
+                    });
+            }
+
+            // Функция для обновления счетчика прослушиваний
+            function updatePlayCount(trackId) {
+                // Отправляем запрос на сервер для увеличения счетчика прослушиваний
+                fetch(`/tracks/${trackId}/play`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute(
+                            'content')
+                    }
+                }).catch(error => {
+                    console.error('Ошибка при обновлении счетчика прослушиваний:', error);
+                });
+            }
+
+            // Переключение воспроизведения/паузы
+            function togglePlayPause() {
+                if (isPlaying) {
                     audio.pause();
-                    playIcon.classList.remove('hidden');
-                    pauseIcon.classList.add('hidden');
-                }
-            });
-
-            // Перемотка
-            progressContainer.addEventListener('click', function(e) {
-                const rect = progressContainer.getBoundingClientRect();
-                const percent = (e.clientX - rect.left) / rect.width;
-                audio.currentTime = percent * audio.duration;
-            });
-
-            // Управление громкостью
-            volumeBtn.addEventListener('click', function() {
-                volumeSlider.classList.toggle('hidden');
-            });
-
-            volumeBtn.addEventListener('mouseenter', function() {
-                volumeSlider.classList.remove('hidden');
-            });
-
-            playerElement.addEventListener('mouseleave', function() {
-                if (!isDragging) {
-                    volumeSlider.classList.add('hidden');
-                }
-            });
-
-            volumeRange.addEventListener('input', function() {
-                audio.volume = this.value / 100;
-                if (this.value == 0) {
-                    volumeHigh.classList.add('hidden');
-                    volumeMute.classList.remove('hidden');
+                    isPlaying = false;
                 } else {
-                    volumeHigh.classList.remove('hidden');
-                    volumeMute.classList.add('hidden');
+                    audio.play();
+                    isPlaying = true;
                 }
-            });
+                updatePlayButton();
+            }
 
-            volumeRange.addEventListener('mousedown', function() {
-                isDragging = true;
-            });
+            // Обновление кнопки воспроизведения
+            function updatePlayButton() {
+                if (!playerPlay) return;
 
-            volumeRange.addEventListener('mouseup', function() {
-                isDragging = false;
-            });
-
-            // Мьют/анмьют
-            volumeBtn.addEventListener('click', function() {
-                if (audio.volume > 0) {
-                    audio.dataset.prevVolume = audio.volume;
-                    audio.volume = 0;
-                    volumeRange.value = 0;
-                    volumeHigh.classList.add('hidden');
-                    volumeMute.classList.remove('hidden');
+                if (isPlaying) {
+                    playerPlay.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                `;
                 } else {
-                    audio.volume = audio.dataset.prevVolume || 1;
-                    volumeRange.value = audio.volume * 100;
-                    volumeHigh.classList.remove('hidden');
-                    volumeMute.classList.add('hidden');
+                    playerPlay.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    </svg>
+                `;
                 }
+            }
+
+            // Воспроизведение предыдущего трека
+            function playPreviousTrack() {
+                if (currentTrackIndex > 0) {
+                    currentTrackIndex--;
+                    playTrack(tracksList[currentTrackIndex]);
+                }
+            }
+
+            // Воспроизведение следующего трека
+            function playNextTrack() {
+                if (currentTrackIndex < tracksList.length - 1) {
+                    currentTrackIndex++;
+                    playTrack(tracksList[currentTrackIndex]);
+                }
+            }
+
+            // Обработчик для кнопки воспроизведения/паузы
+            if (playerPlay) {
+                playerPlay.addEventListener('click', togglePlayPause);
+            }
+
+            // Обработчики для кнопок предыдущего и следующего трека
+            if (playerPrev) {
+                playerPrev.addEventListener('click', playPreviousTrack);
+            }
+
+            if (playerNext) {
+                playerNext.addEventListener('click', playNextTrack);
+            }
+
+            // Обновление прогресса воспроизведения
+            audio.addEventListener('timeupdate', function() {
+                const currentTime = audio.currentTime;
+                const duration = audio.duration || 0;
+                const progressPercent = (currentTime / duration) * 100;
+
+                if (playerProgress) playerProgress.style.width = `${progressPercent}%`;
+                if (playerCurrentTime) playerCurrentTime.textContent = formatTime(currentTime);
+                if (playerDuration) playerDuration.textContent = formatTime(duration);
             });
 
-            // Форматирование времени
+            // Автоматическое воспроизведение следующего трека
+            audio.addEventListener('ended', function() {
+                playNextTrack();
+            });
+
+            // Форматирование времени в формат MM:SS
             function formatTime(seconds) {
                 const minutes = Math.floor(seconds / 60);
-                seconds = Math.floor(seconds % 60);
-                return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                const remainingSeconds = Math.floor(seconds % 60);
+                return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
             }
-        }
-    });
-</script>
+
+            // Прогресс-бар с возможностью перемотки
+            const progressContainer = document.getElementById('progress-container');
+            if (progressContainer) {
+                progressContainer.addEventListener('click', function(e) {
+                    const rect = this.getBoundingClientRect();
+                    const clickPosition = (e.clientX - rect.left) / rect.width;
+                    if (audio.duration) {
+                        audio.currentTime = clickPosition * audio.duration;
+                    }
+                });
+            }
+
+            // Экспортируем функцию воспроизведения трека в глобальную область видимости
+            window.playTrack = playTrack;
+            window.currentTrackId = currentTrackId;
+
+            // Обработчик для динамически добавленных кнопок воспроизведения
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.play-button')) {
+                    const button = e.target.closest('.play-button');
+                    const trackId = button.getAttribute('data-track-id');
+                    if (trackId) {
+                        playTrack(trackId);
+                    }
+                }
+            });
+
+            // Обновляем плейлист при изменении DOM
+            // Используем MutationObserver для отслеживания изменений в DOM
+            const observer = new MutationObserver(function(mutations) {
+                let needsUpdate = false;
+
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                        // Проверяем, есть ли среди добавленных узлов кнопки воспроизведения
+                        mutation.addedNodes.forEach(function(node) {
+                            if (node.nodeType === 1 && (node.classList?.contains(
+                                        'play-button') ||
+                                    node.querySelector?.('.play-button'))) {
+                                needsUpdate = true;
+                            }
+                        });
+                    }
+                });
+
+                if (needsUpdate) {
+                    initializePlaylist();
+                }
+            });
+
+            // Начинаем наблюдение за изменениями в DOM
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        });
+    </script>
+@endpush

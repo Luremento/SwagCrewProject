@@ -6,15 +6,58 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Track\UploadTrackRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use App\Models\{Track, File, Genre};
+use App\Models\{Track, File, Genre, Playlist};
 use Illuminate\Support\Facades\{Auth, Storage};
 
 class TrackController extends Controller
 {
-    public function index() {
+    public function index(Request $request)
+    {
         $genres = Genre::all();
-        $tracks = Track::all();
-        return view('tracks', compact('genres', 'tracks'));
+
+        $currentGenre = null;
+        // Get the query parameters
+        $genreId = $request->input('genre_id');
+        $sort = $request->input('sort', 'latest');
+        $viewType = $request->input('view_type', 'grid'); // Default to grid view
+
+        // Start with a base query
+        $tracksQuery = Track::query();
+
+        // Apply genre filter if specified
+        if ($genreId) {
+            $tracksQuery->where('genre_id', $genreId);
+            $currentGenre = Genre::find($genreId);
+        }
+
+        // Apply sorting
+        if ($sort === 'popular') {
+            $tracksQuery->orderBy('play_count', 'desc');
+        } else {
+            $tracksQuery->latest();
+        }
+
+        // Get the tracks
+        $tracks = $tracksQuery->get();
+
+        $playlists = Playlist::with('tracks')->where('user_id', Auth::id())->get();
+        return view('tracks', compact('genres', 'tracks', 'viewType', 'currentGenre', 'playlists'));
+    }
+
+    // Add this method to your TrackController to get track data for playback
+    public function getTrackData($id)
+    {
+        $track = Track::with(['user', 'files', 'genre'])->findOrFail($id);
+
+        return response()->json([
+            'id' => $track->id,
+            'title' => $track->title,
+            'artist' => $track->user->name,
+            'cover' => $track->cover_image ? asset('storage/' . $track->cover_image) : null,
+            'audio_url' => $track->files->first() ? asset('storage/' . $track->files->first()->path) : null,
+            'genre' => $track->genre->name,
+            'created_at' => $track->created_at->diffForHumans(),
+        ]);
     }
 
     public function create() {

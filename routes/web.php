@@ -8,7 +8,8 @@ use App\Http\Controllers\{
     GenreController,
     ForumTopicController,
     ThreadController,
-    CommentController
+    CommentController,
+    PlaylistController
 };
 use Illuminate\Support\Facades\Route;
 
@@ -32,11 +33,13 @@ Route::middleware('auth')->group(function () {
 
     Route::controller(TrackController::class)->group(function () {
         Route::get('/tracks', 'index')->name('tracks.index');
+        Route::get('/tracks/{id}/data', 'getTrackData')->name('tracks.data');
         Route::get('/theme/track/search', 'search')->name('track.search');
         Route::get('/track/create', 'create')->name('track.create');
         Route::post('/tracks', 'store')->name('tracks.store');
         Route::get('/genres/search', 'searchGenres')->name('genres.search');
         Route::get('/tracks/{track}', 'show')->name('tracks.show');
+        Route::post('/tracks/{id}/play', [TrackController::class, 'incrementPlayCount'])->name('tracks.play');
     });
 
     Route::get('/genres/search', [GenreController::class, 'search'])->name('genres.search');
@@ -45,6 +48,13 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/follow/{user}', [FollowerController::class, 'follow'])->name('follow');
     Route::delete('/unfollow/{user}', [FollowerController::class, 'unfollow'])->name('unfollow');
+
+    Route::middleware(['auth'])->group(function () {
+        Route::resource('playlists', PlaylistController::class);
+        Route::post('/playlists/{playlist}/add-track', [PlaylistController::class, 'addTrack'])->name('playlists.add-track');
+        Route::delete('/playlists/{playlist}/remove-track', [PlaylistController::class, 'removeTrack'])->name('playlists.remove-track');
+        Route::post('/playlists/{playlist}/reorder-tracks', [PlaylistController::class, 'reorderTracks'])->name('playlists.reorder-tracks');
+    });
 });
 
 require __DIR__.'/auth.php';

@@ -34,6 +34,9 @@
         </main>
 
         @include('partials.footer')
+
+        <!-- Аудио-плеер -->
+        @include('components.audio-player')
     </div>
 
     <!-- JavaScript для переключения темы -->

@@ -21,8 +21,8 @@
                     Главная
                 </a>
 
-                <a href="{{ url('/') }}"
-                    class="{{ request()->is('/') ? 'text-primary-600 dark:text-primary-400 font-medium' : 'text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400' }}">
+                <a href="{{ route('tracks.index') }}"
+                    class="{{ request()->routeIs('tracks.index') ? 'text-primary-600 dark:text-primary-400 font-medium' : 'text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400' }}">
                     Треки
                 </a>
 
