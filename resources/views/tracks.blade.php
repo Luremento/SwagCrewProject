@@ -54,46 +54,50 @@
                         </button>
                     </div>
                     <div class="divide-y divide-gray-200 dark:divide-gray-700">
-                        @if (Auth::check() && isset($playlists) && $playlists->count() > 0)
-                            @foreach ($playlists as $playlist)
-                                <a href="{{ route('playlists.show', $playlist->id) }}"
-                                    class="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                    <div
-                                        class="mr-3 h-10 w-10 flex-shrink-0 overflow-hidden rounded-md shadow-sm bg-gray-200 dark:bg-gray-700">
-                                        @if ($playlist->cover_image)
-                                            <img src="{{ asset('storage/' . $playlist->cover_image) }}"
-                                                alt="Обложка {{ $playlist->name }}" class="h-full w-full object-cover">
-                                        @else
-                                            <div
-                                                class="flex h-full w-full items-center justify-center
-                                                    @if ($playlist->name === 'Избранное') bg-gradient-to-br from-purple-500 to-indigo-600
-                                                    @elseif($loop->index % 3 == 1) bg-gradient-to-br from-blue-500 to-cyan-600
-                                                    @elseif($loop->index % 3 == 2) bg-gradient-to-br from-pink-500 to-rose-600
-                                                    @else bg-gradient-to-br from-green-500 to-teal-600 @endif">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white"
-                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                                                </svg>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-900 dark:text-white">{{ $playlist->name }}</span>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ $playlist->tracks->count() }}
-                                            {{ trans_choice('треков|трек|трека', $playlist->tracks->count()) }}</p>
-                                    </div>
-                                </a>
-                            @endforeach
+                        @if (Auth::check())
+                            @if ($playlists->count() > 0)
+                                @foreach ($playlists as $playlist)
+                                    <a href="{{ route('playlists.show', $playlist->id) }}"
+                                        class="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                        <div
+                                            class="mr-3 h-10 w-10 flex-shrink-0 overflow-hidden rounded-md shadow-sm bg-gray-200 dark:bg-gray-700">
+                                            @if ($playlist->cover_image)
+                                                <img src="{{ asset('storage/' . $playlist->cover_image) }}"
+                                                    alt="Обложка {{ $playlist->name }}" class="h-full w-full object-cover">
+                                            @else
+                                                <div
+                                                    class="flex h-full w-full items-center justify-center
+                                                        @if ($playlist->name === 'Избранное') bg-gradient-to-br from-purple-500 to-indigo-600
+                                                        @elseif($loop->index % 3 == 1) bg-gradient-to-br from-blue-500 to-cyan-600
+                                                        @elseif($loop->index % 3 == 2) bg-gradient-to-br from-pink-500 to-rose-600
+                                                        @else bg-gradient-to-br from-green-500 to-teal-600 @endif">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                                                    </svg>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-900 dark:text-white">{{ $playlist->name }}</span>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                {{ $playlist->tracks_count }}
+                                                {{ trans_choice('треков|трек|трека', $playlist->tracks_count) }}</p>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            @else
+                                <div class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                                    У вас пока нет плейлистов. Создайте свой первый плейлист!
+                                </div>
+                            @endif
                         @else
                             <div class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                                @if (Auth::check())
-                                    У вас пока нет плейлистов. Создайте свой первый плейлист!
-                                @else
-                                    <a href="{{ route('login') }}"
-                                        class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">Войдите</a>,
-                                    чтобы создавать плейлисты
-                                @endif
+                                <a href="{{ route('login') }}"
+                                    class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">Войдите</a>,
+                                чтобы создавать плейлисты
                             </div>
                         @endif
                     </div>
@@ -115,7 +119,7 @@
                                 </svg>
                                 <span class="text-gray-900 dark:text-white">{{ $genre->name }}</span>
                                 <span
-                                    class="ml-auto rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-700 dark:text-gray-300">{{ $genre->tracks->count() }}</span>
+                                    class="ml-auto rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-700 dark:text-gray-300">{{ $genre->tracks_count }}</span>
                             </a>
                         @endforeach
                     </div>
@@ -184,7 +188,7 @@
                                             class="h-14 w-14 overflow-hidden rounded-md bg-gray-200 shadow-sm dark:bg-gray-700 flex-none">
                                             @if ($track->cover_image)
                                                 <img src="{{ asset('storage/' . $track->cover_image) }}"
-                                                    alt="Обложка трека" class="h-14 w-14 object-cover">
+                                                    alt="Обложка трека" class="h-14 w-14 object-cover" loading="lazy">
                                             @else
                                                 <div
                                                     class="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-300 to-gray-200 dark:from-gray-600 dark:to-gray-700">
@@ -226,8 +230,9 @@
                                                             d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                                     </svg>
                                                 </button>
-                                                <button type="button" data-track-id="{{ $track->id }}"
-                                                    class="track-options text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 opacity-0 transition-opacity group-hover:opacity-100">
+                                                <button type="button"
+                                                    class="track-options text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 opacity-0 transition-opacity group-hover:opacity-100"
+                                                    onclick="openPlaylistSelector('{{ $track->id }}')">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
                                                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -264,7 +269,8 @@
                                         <div class="relative aspect-square overflow-hidden">
                                             @if ($track->cover_image)
                                                 <img src="{{ asset('storage/' . $track->cover_image) }}"
-                                                    alt="Обложка трека" class="h-full w-full object-cover">
+                                                    alt="Обложка трека" class="h-full w-full object-cover"
+                                                    loading="lazy">
                                             @else
                                                 <div
                                                     class="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-300 to-gray-200 dark:from-gray-600 dark:to-gray-700">
@@ -316,8 +322,9 @@
                                                                 d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                                         </svg>
                                                     </button>
-                                                    <button type="button" data-track-id="{{ $track->id }}"
-                                                        class="track-options text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                                                    <button type="button"
+                                                        class="track-options text-gray-400 hover:text-primary-600 dark:hover:text-primary-400"
+                                                        onclick="openPlaylistSelector('{{ $track->id }}')">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
                                                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -337,42 +344,13 @@
 
                 <!-- Пагинация -->
                 <div class="mt-6 flex justify-center">
-                    <nav class="flex items-center space-x-2">
-                        <a href="#"
-                            class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
-                            <span class="sr-only">Предыдущая</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 19l-7-7 7-7" />
-                            </svg>
-                        </a>
-                        <a href="#"
-                            class="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600">1</a>
-                        <a href="#"
-                            class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">2</a>
-                        <a href="#"
-                            class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">3</a>
-                        <span
-                            class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">...</span>
-                        <a href="#"
-                            class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">8</a>
-                        <a href="#"
-                            class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
-                            <span class="sr-only">Следующая</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </a>
-                    </nav>
+                    {{ $tracks->appends(request()->except('page'))->links() }}
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Подключаем компоненты -->
-    @include('components.audio-player')
     @include('components.playlist-selector')
     @include('components.playlist-creator')
 @endsection

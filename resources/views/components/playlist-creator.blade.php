@@ -78,7 +78,7 @@
                         class="inline-flex w-full justify-center rounded-lg bg-primary-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:bg-primary-700 dark:hover:bg-primary-600 sm:ml-3 sm:w-auto sm:text-sm">
                         Создать
                     </button>
-                    <button type="button" id="cancel-playlist-btn"
+                    <button type="button" id="cancel-playlist-creator-btn"
                         class="mt-3 inline-flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                         Отмена
                     </button>
@@ -95,7 +95,7 @@
             const createPlaylistModal = document.getElementById('create-playlist-modal');
             const createNewPlaylistBtn = document.getElementById('create-new-playlist-btn');
             const openCreatePlaylistBtn = document.getElementById('open-create-playlist-btn');
-            const cancelPlaylistBtn = document.getElementById('cancel-playlist-btn');
+            const cancelPlaylistCreatorBtn = document.getElementById('cancel-playlist-creator-btn');
             const playlistCoverInput = document.getElementById('playlist-cover');
             const coverPreview = document.getElementById('cover-preview');
 
@@ -136,11 +136,26 @@
             }
 
             // Закрытие модального окна создания плейлиста
-            if (cancelPlaylistBtn && createPlaylistModal) {
-                cancelPlaylistBtn.addEventListener('click', function() {
+            if (cancelPlaylistCreatorBtn && createPlaylistModal) {
+                cancelPlaylistCreatorBtn.addEventListener('click', function() {
                     createPlaylistModal.classList.add('hidden');
                 });
             }
+
+            // Закрытие модального окна при клике вне его
+            window.addEventListener('click', function(event) {
+                if (event.target === createPlaylistModal) {
+                    createPlaylistModal.classList.add('hidden');
+                }
+            });
+
+            // Закрытие модального окна при нажатии Escape
+            window.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && createPlaylistModal && !createPlaylistModal.classList
+                    .contains('hidden')) {
+                    createPlaylistModal.classList.add('hidden');
+                }
+            });
         });
     </script>
 @endpush

@@ -12,6 +12,7 @@ use App\Http\Controllers\{
     PlaylistController
 };
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 Route::controller(MainController::class)->group(function () {
     Route::get('/', 'index')->name('index');
@@ -54,6 +55,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/playlists/{playlist}/add-track', [PlaylistController::class, 'addTrack'])->name('playlists.add-track');
         Route::delete('/playlists/{playlist}/remove-track', [PlaylistController::class, 'removeTrack'])->name('playlists.remove-track');
         Route::post('/playlists/{playlist}/reorder-tracks', [PlaylistController::class, 'reorderTracks'])->name('playlists.reorder-tracks');
+        Route::get('/playlists-list', [PlaylistController::class, 'getPlaylistsList'])->name('playlists.list');
     });
 });
 

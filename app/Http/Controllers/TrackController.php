@@ -2,137 +2,209 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Track\UploadTrackRequest;
+use App\Models\Genre;
+use App\Models\Track;
+use App\Models\Playlist;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use App\Models\{Track, File, Genre, Playlist};
-use Illuminate\Support\Facades\{Auth, Storage};
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\Track\UploadTrackRequest;
 
 class TrackController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
     public function index(Request $request)
     {
-        $genres = Genre::all();
+        // Получаем все жанры
+        $genres = Genre::withCount('tracks')->get();
+
+        // Получаем плейлисты пользователя
+        $playlists = Auth::check() ? Auth::user()->playlists()->withCount('tracks')->get() : collect([]);
+
+        // Определяем тип отображения (список или сетка)
+        $viewType = $request->query('view_type', 'list');
+
+        // Базовый запрос для треков
+        $tracksQuery = Track::with(['user', 'genre']);
 
         $currentGenre = null;
-        // Get the query parameters
-        $genreId = $request->input('genre_id');
-        $sort = $request->input('sort', 'latest');
-        $viewType = $request->input('view_type', 'grid'); // Default to grid view
-
-        // Start with a base query
-        $tracksQuery = Track::query();
-
-        // Apply genre filter if specified
-        if ($genreId) {
-            $tracksQuery->where('genre_id', $genreId);
-            $currentGenre = Genre::find($genreId);
+        // Фильтрация по жанру, если указан
+        if ($request->has('genre_id')) {
+            $tracksQuery->where('genre_id', $request->genre_id);
+            $currentGenre = Genre::findOrFail($request->genre_id);
         }
 
-        // Apply sorting
-        if ($sort === 'popular') {
+        // Сортировка
+        if ($request->query('sort') === 'popular') {
             $tracksQuery->orderBy('play_count', 'desc');
         } else {
             $tracksQuery->latest();
         }
 
-        // Get the tracks
-        $tracks = $tracksQuery->get();
+        // Получаем треки с пагинацией
+        $tracks = $tracksQuery->paginate(15);
 
-        $playlists = Playlist::with('tracks')->where('user_id', Auth::id())->get();
-        return view('tracks', compact('genres', 'tracks', 'viewType', 'currentGenre', 'playlists'));
+        return view('tracks', compact('tracks', 'genres', 'playlists', 'viewType', 'currentGenre'));
     }
 
-    // Add this method to your TrackController to get track data for playback
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        $genres = Genre::all();
+        return view('track.upload', compact('genres'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(UploadTrackRequest $request)
+    {
+        $track = new Track();
+        $track->user_id = Auth::id();
+        $track->title = $request->title;
+        $track->description = $request->description;
+        $track->genre_id = $request->genre_id;
+
+        // Обработка загрузки аудиофайла
+        if ($request->hasFile('audio_file')) {
+            $audioPath = $request->file('audio_file')->store('tracks', 'public');
+            $track->audio_path = $audioPath;
+        }
+
+        // Обработка загрузки обложки
+        if ($request->hasFile('cover_image')) {
+            $coverPath = $request->file('cover_image')->store('covers', 'public');
+            $track->cover_image = $coverPath;
+        }
+
+        $track->save();
+
+        // Добавляем трек в плейлист "Избранное", если он существует
+        if ($request->has('add_to_favorites') && $request->add_to_favorites) {
+            $favoritePlaylist = Auth::user()->playlists()->where('name', 'Избранное')->first();
+
+            if (!$favoritePlaylist) {
+                // Создаем плейлист "Избранное", если он не существует
+                $favoritePlaylist = new Playlist();
+                $favoritePlaylist->user_id = Auth::id();
+                $favoritePlaylist->name = 'Избранное';
+                $favoritePlaylist->is_public = false;
+                $favoritePlaylist->save();
+            }
+
+            // Добавляем трек в плейлист
+            $favoritePlaylist->tracks()->attach($track->id, ['position' => $favoritePlaylist->tracks()->count() + 1]);
+        }
+
+        return redirect()->route('tracks.show', $track->id)->with('success', 'Трек успешно загружен!');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Track $track)
+    {
+        $track->load(['user', 'genre', 'comments.user']);
+
+        // Получаем плейлисты пользователя
+        $playlists = Auth::check() ? Auth::user()->playlists()->withCount('tracks')->get() : collect([]);
+
+        // Получаем похожие треки (того же жанра)
+        $similarTracks = Track::where('genre_id', $track->genre_id)
+            ->where('id', '!=', $track->id)
+            ->with('user')
+            ->inRandomOrder()
+            ->limit(5)
+            ->get();
+
+        return view('track.show', compact('track', 'playlists', 'similarTracks'));
+    }
+
+    /**
+     * Get track data for the audio player.
+     */
     public function getTrackData($id)
     {
-        $track = Track::with(['user', 'files', 'genre'])->findOrFail($id);
+        $track = Track::with(['user', 'genre'])->findOrFail($id);
 
         return response()->json([
             'id' => $track->id,
             'title' => $track->title,
             'artist' => $track->user->name,
-            'cover' => $track->cover_image ? asset('storage/' . $track->cover_image) : null,
-            'audio_url' => $track->files->first() ? asset('storage/' . $track->files->first()->path) : null,
+            'audio_url' => asset('storage/' . $track->audio_path),
+            'cover_image' => $track->cover_image ? asset('storage/' . $track->cover_image) : null,
             'genre' => $track->genre->name,
             'created_at' => $track->created_at->diffForHumans(),
+            'user_id' => $track->user->id,
+            'user_profile_url' => route('profile.index', $track->user->id)
         ]);
-    }
-
-    public function create() {
-        return view('track.upload');
     }
 
     /**
-     * Сохранить новый трек
+     * Increment play count for a track.
      */
-    public function store(UploadTrackRequest $request)
+    public function incrementPlayCount($id)
     {
-        // Валидация данных
-        $validated = $request->validated();
+        $track = Track::findOrFail($id);
+        $track->increment('play_count');
 
-        // Обработка жанра
-        $genre = Genre::firstOrCreate(['name' => $validated['genre']]);
-
-        // Обработка аудио файла
-        $audioFile = $request->file('audio_file');
-        $audioFileName = Str::uuid() . '.' . $audioFile->getClientOriginalExtension();
-        $audioPath = $audioFile->storeAs('tracks', $audioFileName, 'public');
-
-        // Обработка обложки
-        $coverImage = $request->file('cover_image');
-        $coverFileName = Str::uuid() . '.' . $coverImage->getClientOriginalExtension();
-        $coverPath = $coverImage->storeAs('covers', $coverFileName, 'public');
-
-        // Создание трека
-        $track = Track::create([
-            'user_id' => Auth::id(),
-            'genre_id' => $genre->id,
-            'title' => $validated['title'],
-            'cover_image' => $coverPath,
-        ]);
-
-        // Привязка файла к треку через полиморфную связь
-        $track->files()->create([
-            'original_name' => $audioFile->getClientOriginalName(),
-            'path' => $audioPath,
-            'hash' => md5_file($audioFile->getRealPath()),
-            'size' => $audioFile->getSize(),
-        ]);
-
-        return redirect()->route('tracks.show', $track)
-            ->with('success', 'Трек успешно загружен!');
+        return response()->json(['success' => true, 'play_count' => $track->play_count]);
     }
 
+    /**
+     * Search for tracks.
+     */
     public function search(Request $request)
     {
         $query = $request->input('query');
 
-        // Валидация
-        $request->validate([
-            'query' => 'required|string|min:2|max:100',
-        ]);
+        if (empty($query)) {
+            return response()->json([]);
+        }
 
-        // Поиск треков
         $tracks = Track::where('title', 'like', "%{$query}%")
-            ->orWhereHas('user', function($q) use ($query) {
-                $q->where('name', 'like', "%{$query}%");
-            })
-            ->with('user') // Подгружаем связанного пользователя
+            ->with(['user', 'genre'])
             ->limit(10)
-            ->get();
-
-        return response()->json([
-            'tracks' => $tracks->map(function($track) {
+            ->get()
+            ->map(function ($track) {
                 return [
                     'id' => $track->id,
                     'title' => $track->title,
                     'artist' => $track->user->name,
-                    'cover' => $track->cover_image ?? '/images/default-cover.jpg',
-                    'url' => $track->file_url,
+                    'cover_image' => $track->cover_image ? asset('storage/' . $track->cover_image) : null,
+                    'genre' => $track->genre->name,
+                    'url' => route('tracks.show', $track->id)
                 ];
-            })
-        ]);
+            });
+
+        return response()->json($tracks);
+    }
+
+    /**
+     * Search for genres.
+     */
+    public function searchGenres(Request $request)
+    {
+        $query = $request->input('query');
+
+        if (empty($query)) {
+            return response()->json([]);
+        }
+
+        $genres = Genre::where('name', 'like', "%{$query}%")
+            ->limit(10)
+            ->get()
+            ->map(function ($genre) {
+                return [
+                    'id' => $genre->id,
+                    'name' => $genre->name
+                ];
+            });
+
+        return response()->json($genres);
     }
 }

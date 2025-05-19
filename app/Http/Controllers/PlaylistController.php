@@ -21,6 +21,20 @@ class PlaylistController extends Controller
     }
 
     /**
+     * Get a list of user's playlists for the selector.
+     */
+    public function getPlaylistsList()
+    {
+        $playlists = Auth::user()->playlists()->select('id', 'name')->get();
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json($playlists);
+        }
+
+        return $playlists;
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
@@ -37,9 +51,14 @@ class PlaylistController extends Controller
             'name' => 'required|string|max:100',
             'description' => 'nullable|string',
             'cover_image' => 'nullable|image|max:2048',
+            'is_public' => 'nullable|boolean',
+            'redirect_with_track_id' => 'nullable|exists:tracks,id',
         ]);
 
         if ($validator->fails()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
@@ -49,6 +68,7 @@ class PlaylistController extends Controller
         $playlist->user_id = Auth::id();
         $playlist->name = $request->name;
         $playlist->description = $request->description;
+        $playlist->is_public = $request->has('is_public') ? true : false;
 
         // Обработка загрузки обложки
         if ($request->hasFile('cover_image')) {
@@ -58,13 +78,21 @@ class PlaylistController extends Controller
 
         $playlist->save();
 
-        // Проверяем, был ли запрос AJAX
-        if ($request->ajax()) {
+        // Если был передан ID трека, добавляем его в новый плейлист
+        if ($request->has('redirect_with_track_id')) {
+            $trackId = $request->redirect_with_track_id;
+            $playlist->tracks()->attach($trackId, ['position' => 1]);
+
+            return redirect()->back()->with('success', 'Плейлист успешно создан и трек добавлен!');
+        }
+
+        // Проверяем, был ли запрос AJAX или ожидается JSON
+        if ($request->ajax() || $request->wantsJson()) {
             return response()->json($playlist, 201);
         }
 
         // Если это обычная отправка формы, перенаправляем на страницу плейлиста
-        return redirect()->back()->with('success', 'Плейлист успешно создан!');
+        return redirect()->route('playlists.show', $playlist)->with('success', 'Плейлист успешно создан!');
     }
 
     /**
@@ -165,7 +193,10 @@ class PlaylistController extends Controller
     {
         // Проверяем, что пользователь является владельцем плейлиста
         if ($playlist->user_id !== Auth::id()) {
-            return response()->json(['error' => 'У вас нет прав на редактирование этого плейлиста'], 403);
+            if ($request->wantsJson()) {
+                return response()->json(['error' => 'У вас нет прав на редактирование этого плейлиста'], 403);
+            }
+            return redirect()->back()->with('error', 'У вас нет прав на редактирование этого плейлиста');
         }
 
         $validator = Validator::make($request->all(), [
@@ -173,14 +204,20 @@ class PlaylistController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            if ($request->wantsJson()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+            return redirect()->back()->withErrors($validator);
         }
 
         $trackId = $request->track_id;
 
         // Проверяем, есть ли уже этот трек в плейлисте
         if ($playlist->tracks()->where('track_id', $trackId)->exists()) {
-            return response()->json(['message' => 'Этот трек уже добавлен в плейлист'], 200);
+            if ($request->wantsJson()) {
+                return response()->json(['message' => 'Этот трек уже добавлен в плейлист'], 200);
+            }
+            return redirect()->back()->with('info', 'Этот трек уже добавлен в плейлист');
         }
 
         // Получаем максимальную позицию в плейлисте
@@ -189,7 +226,11 @@ class PlaylistController extends Controller
         // Добавляем трек в плейлист
         $playlist->tracks()->attach($trackId, ['position' => $maxPosition + 1]);
 
-        return redirect()->back()->with('Трек успешно добавлен в плейлист');
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'Трек успешно добавлен в плейлист'], 200);
+        }
+
+        return redirect()->back()->with('success', 'Трек успешно добавлен в плейлист');
     }
 
     /**
