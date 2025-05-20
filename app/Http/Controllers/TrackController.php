@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\File;
 use App\Models\Genre;
 use App\Models\Track;
 use App\Models\Playlist;
@@ -9,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Track\UploadTrackRequest;
+use Illuminate\Support\Str;
 
 class TrackController extends Controller
 {
@@ -63,52 +65,49 @@ class TrackController extends Controller
      */
     public function store(UploadTrackRequest $request)
     {
-        $track = new Track();
-        $track->user_id = Auth::id();
-        $track->title = $request->title;
-        $track->description = $request->description;
-        $track->genre_id = $request->genre_id;
+        // Валидация данных
+        $validated = $request->validated();
 
-        // Обработка загрузки аудиофайла
-        if ($request->hasFile('audio_file')) {
-            $audioPath = $request->file('audio_file')->store('tracks', 'public');
-            $track->audio_path = $audioPath;
-        }
+        // Обработка жанра
+        $genre = Genre::firstOrCreate(['name' => $validated['genre']]);
 
-        // Обработка загрузки обложки
-        if ($request->hasFile('cover_image')) {
-            $coverPath = $request->file('cover_image')->store('covers', 'public');
-            $track->cover_image = $coverPath;
-        }
+        // Обработка аудио файла
+        $audioFile = $request->file('audio_file');
+        $audioFileName = Str::uuid() . '.' . $audioFile->getClientOriginalExtension();
+        $audioPath = $audioFile->storeAs('tracks', $audioFileName, 'public');
 
-        $track->save();
+        // Обработка обложки
+        $coverImage = $request->file('cover_image');
+        $coverFileName = Str::uuid() . '.' . $coverImage->getClientOriginalExtension();
+        $coverPath = $coverImage->storeAs('covers', $coverFileName, 'public');
 
-        // Добавляем трек в плейлист "Избранное", если он существует
-        if ($request->has('add_to_favorites') && $request->add_to_favorites) {
-            $favoritePlaylist = Auth::user()->playlists()->where('name', 'Избранное')->first();
+        // Создание трека
+        $track = Track::create([
+            'user_id' => Auth::id(),
+            'genre_id' => $genre->id,
+            'title' => $validated['title'],
+            'cover_image' => $coverPath,
+        ]);
 
-            if (!$favoritePlaylist) {
-                // Создаем плейлист "Избранное", если он не существует
-                $favoritePlaylist = new Playlist();
-                $favoritePlaylist->user_id = Auth::id();
-                $favoritePlaylist->name = 'Избранное';
-                $favoritePlaylist->is_public = false;
-                $favoritePlaylist->save();
-            }
+        // Привязка файла к треку через полиморфную связь
+        $track->files()->create([
+            'original_name' => $audioFile->getClientOriginalName(),
+            'path' => $audioPath,
+            'hash' => md5_file($audioFile->getRealPath()),
+            'size' => $audioFile->getSize(),
+        ]);
 
-            // Добавляем трек в плейлист
-            $favoritePlaylist->tracks()->attach($track->id, ['position' => $favoritePlaylist->tracks()->count() + 1]);
-        }
-
-        return redirect()->route('tracks.show', $track->id)->with('success', 'Трек успешно загружен!');
+        return redirect()->route('tracks.show', $track)
+            ->with('success', 'Трек успешно загружен!');
     }
+
 
     /**
      * Display the specified resource.
      */
     public function show(Track $track)
     {
-        $track->load(['user', 'genre', 'comments.user']);
+        $track->load(['user', 'genre']);
 
         // Получаем плейлисты пользователя
         $playlists = Auth::check() ? Auth::user()->playlists()->withCount('tracks')->get() : collect([]);
@@ -124,23 +123,29 @@ class TrackController extends Controller
         return view('track.show', compact('track', 'playlists', 'similarTracks'));
     }
 
-    /**
-     * Get track data for the audio player.
-     */
     public function getTrackData($id)
     {
-        $track = Track::with(['user', 'genre'])->findOrFail($id);
+        // Загружаем трек
+        $track = Track::findOrFail($id);
+
+        // Получаем файлы напрямую из базы данных
+        $file = \DB::table('files')->first();
+
+        // dd($file);
+
+        // Формируем URL к аудиофайлу
+        $audioUrl = null;
+        if ($file) {
+            $audioUrl = asset('storage/' . $file->path);
+        }
 
         return response()->json([
             'id' => $track->id,
             'title' => $track->title,
             'artist' => $track->user->name,
-            'audio_url' => asset('storage/' . $track->audio_path),
-            'cover_image' => $track->cover_image ? asset('storage/' . $track->cover_image) : null,
+            'cover' => $track->cover_image ? asset('storage/' . $track->cover_image) : null,
+            'audio_url' => $audioUrl,
             'genre' => $track->genre->name,
-            'created_at' => $track->created_at->diffForHumans(),
-            'user_id' => $track->user->id,
-            'user_profile_url' => route('profile.index', $track->user->id)
         ]);
     }
 
@@ -162,26 +167,31 @@ class TrackController extends Controller
     {
         $query = $request->input('query');
 
-        if (empty($query)) {
-            return response()->json([]);
-        }
+        // Валидация
+        $request->validate([
+            'query' => 'required|string|min:2|max:100',
+        ]);
 
+        // Поиск треков
         $tracks = Track::where('title', 'like', "%{$query}%")
-            ->with(['user', 'genre'])
+            ->orWhereHas('user', function($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%");
+            })
+            ->with('user') // Подгружаем связанного пользователя
             ->limit(10)
-            ->get()
-            ->map(function ($track) {
+            ->get();
+
+        return response()->json([
+            'tracks' => $tracks->map(function($track) {
                 return [
                     'id' => $track->id,
                     'title' => $track->title,
                     'artist' => $track->user->name,
-                    'cover_image' => $track->cover_image ? asset('storage/' . $track->cover_image) : null,
-                    'genre' => $track->genre->name,
-                    'url' => route('tracks.show', $track->id)
+                    'cover' => $track->cover_image ?? '/images/default-cover.jpg',
+                    'url' => $track->file_url,
                 ];
-            });
-
-        return response()->json($tracks);
+            })
+        ]);
     }
 
     /**

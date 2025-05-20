@@ -21,6 +21,10 @@ Route::get('/forum', [ForumTopicController::class, 'index'])->name('forum.index'
 Route::get('/thread/create', [ThreadController::class, 'create'])->name('thread.create');
 Route::post('/thread', [ThreadController::class, 'store'])->name('thread.store');
 Route::get('/thread/{thread}', [ThreadController::class, 'show'])->name('thread.show');
+Route::get('/thread/{thread}/edit', [ThreadController::class, 'edit'])->name('thread.edit');
+Route::put('/thread/{id}', [App\Http\Controllers\ThreadController::class, 'update'])->name('thread.update');
+Route::delete('/thread/{id}', [App\Http\Controllers\ThreadController::class, 'destroy'])->name('thread.destroy');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -34,7 +38,7 @@ Route::middleware('auth')->group(function () {
 
     Route::controller(TrackController::class)->group(function () {
         Route::get('/tracks', 'index')->name('tracks.index');
-        Route::get('/tracks/{id}/data', 'getTrackData')->name('tracks.data');
+        Route::get('/tracks/{id}/data', [TrackController::class, 'getTrackData'])->name('tracks.data');
         Route::get('/theme/track/search', 'search')->name('track.search');
         Route::get('/track/create', 'create')->name('track.create');
         Route::post('/tracks', 'store')->name('tracks.store');

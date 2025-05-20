@@ -69,23 +69,75 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <div
-                            class="flex items-center rounded-full bg-primary-50 px-3 py-1 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                            </svg>
-                            <span class="text-sm font-medium">{{ $thread->category->name }}</span>
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="flex items-center rounded-full bg-primary-50 px-3 py-1 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                </svg>
+                                <span class="text-sm font-medium">{{ $thread->category->name }}</span>
+                            </div>
+
+                            <!-- Добавляем выпадающее меню с действиями -->
+                            <div class="relative" x-data="{ open: false }">
+                                <button @click="open = !open"
+                                    class="rounded-full p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+                                    </svg>
+                                </button>
+
+                                <!-- Выпадающее меню -->
+                                <div x-show="open" @click.away="open = false"
+                                    class="absolute right-0 mt-2 w-48 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700">
+                                    @if (Auth::id() === $thread->user_id || (Auth::check() && Auth::user()->hasRole('admin')))
+                                        <a href="{{ route('thread.edit', $thread->id) }}"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
+                                            <div class="flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                                Редактировать
+                                            </div>
+                                        </a>
+                                        <form action="{{ route('thread.destroy', $thread->id) }}" method="POST"
+                                            class="delete-form">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button"
+                                                class="delete-thread-btn block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:text-red-400 dark:hover:bg-gray-700">
+                                                <div class="flex items-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                    Удалить
+                                                </div>
+                                            </button>
+                                        </form>
+                                    @endif
+                                    <a href="#"
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
+                                        <div class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                                            </svg>
+                                            Сохранить
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                        <button
-                            class="rounded-full p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
-                            </svg>
-                        </button>
                     </div>
                 </div>
                 <h1 class="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
@@ -268,7 +320,7 @@
                 <div class="prose max-w-none dark:prose-invert">
                     {!! $thread->content !!}
                 </div>
-                <div class="mt-6 flex items-center justify-between border-t border-gray-200 pt-6 dark:border-gray-700">
+                {{-- <div class="mt-6 flex items-center justify-between border-t border-gray-200 pt-6 dark:border-gray-700">
                     <div class="flex items-center gap-4">
                         <button
                             class="flex items-center text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400">
@@ -307,7 +359,7 @@
                         </svg>
                         <span class="text-sm font-medium">Сохранить</span>
                     </button>
-                </div>
+                </div> --}}
             </div>
         </div>
 
@@ -723,10 +775,10 @@
                             <div class="mr-2 h-8 w-8 flex-shrink-0 overflow-hidden rounded bg-gray-200 dark:bg-gray-700">
                                 ${cover ? `<img src="${storageBaseUrl}/${cover}" alt="Обложка трека" class="h-full w-full object-cover">` :
                                 `<div class="flex h-full w-full items-center justify-center">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                                                    </svg>
-                                                </div>`}
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                                                                                    </svg>
+                                                                                </div>`}
                             </div>
                             <div>
                                 <p class="text-xs font-medium text-gray-900 dark:text-white">${title}</p>
@@ -865,6 +917,22 @@
 
                 return fileItem;
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Обработка удаления темы с подтверждением
+            const deleteButtons = document.querySelectorAll('.delete-thread-btn');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    if (confirm(
+                            'Вы уверены, что хотите удалить эту тему? Это действие нельзя отменить.'
+                        )) {
+                        this.closest('form').submit();
+                    }
+                });
+            });
         });
     </script>
 @endsection

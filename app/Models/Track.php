@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Track extends Model
 {
@@ -23,8 +24,9 @@ class Track extends Model
      */
     public function files()
     {
-        return $this->morphMany(File::class, 'fileable');
+        return $this->morphMany(\App\Models\File::class, 'fileable');
     }
+
 
     /**
      * Получить основной аудио файл трека
