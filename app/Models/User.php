@@ -92,4 +92,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(Playlist::class);
     }
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    /**
+     * Проверить, добавлен ли трек в избранное.
+     */
+    public function hasFavorite($trackId)
+    {
+        return $this->favorites()->where('track_id', $trackId)->exists();
+    }
 }

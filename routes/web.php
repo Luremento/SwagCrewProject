@@ -11,12 +11,14 @@ use App\Http\Controllers\{
     CommentController,
     PlaylistController
 };
+use App\Http\Controllers\FavoriteController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
 Route::controller(MainController::class)->group(function () {
     Route::get('/', 'index')->name('index');
 });
+Route::post('/favorites/toggle/{track}', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
 Route::get('/forum', [ForumTopicController::class, 'index'])->name('forum.index');
 Route::get('/thread/create', [ThreadController::class, 'create'])->name('thread.create');
 Route::post('/thread', [ThreadController::class, 'store'])->name('thread.store');

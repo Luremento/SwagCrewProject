@@ -53,4 +53,9 @@ class Track extends Model
             ->withPivot('position')
             ->withTimestamps();
     }
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
 }

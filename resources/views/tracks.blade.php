@@ -221,15 +221,20 @@
                                                 {{ $track->title }}
                                             </a>
                                             <div class="ml-4 flex flex-shrink-0 items-center gap-3">
-                                                <button type="button" data-track-id="{{ $track->id }}"
-                                                    class="add-to-favorites text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 opacity-0 transition-opacity group-hover:opacity-100">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
-                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                                    </svg>
-                                                </button>
+                                                <form action="{{ route('favorites.toggle', $track->id) }}" method="POST"
+                                                    class="inline">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="{{ Auth::check() && Auth::user()->hasFavorite($track->id) ? 'text-red-500' : 'text-gray-400' }} hover:text-primary-600 dark:hover:text-primary-400 opacity-0 transition-opacity group-hover:opacity-100">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                                            fill="{{ Auth::check() && Auth::user()->hasFavorite($track->id) ? 'currentColor' : 'none' }}"
+                                                            viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                        </svg>
+                                                    </button>
+                                                </form>
                                                 <button type="button"
                                                     class="track-options text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 opacity-0 transition-opacity group-hover:opacity-100"
                                                     onclick="openPlaylistSelector('{{ $track->id }}')">
@@ -313,15 +318,20 @@
                                                     {{ $track->genre->name }}
                                                 </span>
                                                 <div class="flex items-center gap-2">
-                                                    <button type="button" data-track-id="{{ $track->id }}"
-                                                        class="add-to-favorites text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
-                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                                        </svg>
-                                                    </button>
+                                                    <form action="{{ route('favorites.toggle', $track->id) }}"
+                                                        method="POST" class="inline">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="{{ Auth::check() && Auth::user()->hasFavorite($track->id) ? 'text-red-500' : 'text-gray-400' }} hover:text-primary-600 dark:hover:text-primary-400">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                                                fill="{{ Auth::check() && Auth::user()->hasFavorite($track->id) ? 'currentColor' : 'none' }}"
+                                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                            </svg>
+                                                        </button>
+                                                    </form>
                                                     <button type="button"
                                                         class="track-options text-gray-400 hover:text-primary-600 dark:hover:text-primary-400"
                                                         onclick="openPlaylistSelector('{{ $track->id }}')">
@@ -353,4 +363,44 @@
     <!-- Подключаем компоненты -->
     @include('components.playlist-selector')
     @include('components.playlist-creator')
+
+    @if (session('notification'))
+        <div id="notification"
+            class="fixed bottom-4 right-4 rounded-lg bg-green-50 p-4 text-green-800 shadow-lg dark:bg-green-900/30 dark:text-green-400 z-50">
+            <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{{ session('notification') }}</span>
+            </div>
+        </div>
+        <script>
+            // Автоматически скрыть уведомление через 3 секунды
+            setTimeout(() => {
+                const notification = document.getElementById('notification');
+                if (notification) {
+                    notification.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 500);
+                }
+            }, 3000);
+        </script>
+    @endif
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Обработчик для кнопок воспроизведения
+            const playButtons = document.querySelectorAll('.play-button');
+            playButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const trackId = this.getAttribute('data-track-id');
+                    // Здесь ваш код для воспроизведения трека
+                    console.log('Play track:', trackId);
+                });
+            });
+        });
+    </script>
 @endsection
