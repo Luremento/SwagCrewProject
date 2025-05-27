@@ -20,17 +20,27 @@ class ProfileController extends Controller
     {
         if ($user) {
             $profileUser = User::where('id', $user)
-                            ->orWhere('name', $user)
-                            ->firstOrFail();
+                ->orWhere('name', $user)
+                ->with([
+                    'tracks' => function ($query) {
+                        $query->withCount('favorites')->with('genre');
+                    }
+                ])
+                ->firstOrFail();
         } else {
             $profileUser = Auth::user();
+            $profileUser->load([
+                'tracks' => function ($query) {
+                    $query->withCount('favorites')->with('genre');
+                }
+            ]);
         }
 
         $topTopics = $profileUser->threads()
-        ->withCount('comments')
-        ->orderByDesc('comments_count')
-        ->take(3)
-        ->get();
+            ->withCount('comments')
+            ->orderByDesc('comments_count')
+            ->take(3)
+            ->get();
 
         return view('profile', [
             'user' => $profileUser,

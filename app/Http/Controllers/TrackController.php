@@ -40,7 +40,7 @@ class TrackController extends Controller
 
         // Сортировка
         if ($request->query('sort') === 'popular') {
-            $tracksQuery->orderBy('play_count', 'desc');
+            $tracksQuery->withCount('favorites')->orderByDesc('favorites_count');
         } else {
             $tracksQuery->latest();
         }
@@ -174,7 +174,7 @@ class TrackController extends Controller
 
         // Поиск треков
         $tracks = Track::where('title', 'like', "%{$query}%")
-            ->orWhereHas('user', function($q) use ($query) {
+            ->orWhereHas('user', function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%");
             })
             ->with('user') // Подгружаем связанного пользователя
@@ -182,7 +182,7 @@ class TrackController extends Controller
             ->get();
 
         return response()->json([
-            'tracks' => $tracks->map(function($track) {
+            'tracks' => $tracks->map(function ($track) {
                 return [
                     'id' => $track->id,
                     'title' => $track->title,

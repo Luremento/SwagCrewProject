@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Auth;
 
 Route::controller(MainController::class)->group(function () {
     Route::get('/', 'index')->name('index');
+    Route::get('/search', 'search')->name('search.index');
+    Route::get('/search/suggestions', 'searchSuggestions')->name('search.suggestions');
+
 });
 Route::post('/favorites/toggle/{track}', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
 Route::get('/forum', [ForumTopicController::class, 'index'])->name('forum.index');
@@ -37,7 +40,6 @@ Route::middleware('auth')->group(function () {
     Route::put('/social-links/{platform}', [ProfileController::class, 'updateSocialLink'])->name('social-links.update');
     Route::get('/profile/{user?}', [ProfileController::class, 'index'])->name('profile.index');
 
-
     Route::controller(TrackController::class)->group(function () {
         Route::get('/tracks', 'index')->name('tracks.index');
         Route::get('/tracks/{id}/data', [TrackController::class, 'getTrackData'])->name('tracks.data');
@@ -49,9 +51,13 @@ Route::middleware('auth')->group(function () {
         Route::post('/tracks/{id}/play', [TrackController::class, 'incrementPlayCount'])->name('tracks.play');
     });
 
+
     Route::get('/genres/search', [GenreController::class, 'search'])->name('genres.search');
 
     Route::post('/comment', [CommentController::class, 'store'])->name('comments.store');
+    // Новые маршруты для редактирования и удаления
+    Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
     Route::post('/follow/{user}', [FollowerController::class, 'follow'])->name('follow');
     Route::delete('/unfollow/{user}', [FollowerController::class, 'unfollow'])->name('unfollow');
@@ -65,4 +71,4 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

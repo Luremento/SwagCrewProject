@@ -90,7 +90,7 @@
             </div>
 
             <!-- Информация о пользователе -->
-            <div class="ml-48 pb-6 pt-8">
+            {{-- <div class="ml-48 pb-6 pt-8">
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $user->name }}</h1>
                 <div class="mt-1 flex items-center">
                     <span
@@ -103,7 +103,7 @@
                         Проверенный музыкант
                     </span>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Кнопки действий -->
             @auth
@@ -282,7 +282,6 @@
 
     <!-- Вкладки профиля -->
     <div class="mt-10">
-
         <!-- Содержимое вкладки "Треки" -->
         <div class="mt-8">
             <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
@@ -294,19 +293,21 @@
                 </h2>
                 <div class="flex items-center">
                     <span class="mr-3 text-gray-600 dark:text-gray-400">Сортировать:</span>
-                    <select
+                    <select id="trackSortSelect"
                         class="rounded-full border-none bg-gray-100 px-4 py-2 text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-300">
-                        <option>Новые</option>
-                        <option>Популярные</option>
-                        <option>По рейтингу</option>
+                        <option value="newest">Новые</option>
+                        <option value="popular">Популярные</option>
+                        <option value="oldest">Старые</option>
+                        <option value="alphabetical">По алфавиту</option>
                     </select>
                 </div>
             </div>
 
-            <div class="space-y-6">
+            <div id="tracksContainer" class="space-y-6">
                 @foreach ($user->tracks as $track)
-                    <div
-                        class="group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:bg-gray-800/80 dark:backdrop-blur-sm">
+                    <div data-track-id="{{ $track->id }}" data-created="{{ $track->created_at->timestamp }}"
+                        data-favorites="{{ $track->favorites_count ?? 0 }}" data-title="{{ strtolower($track->title) }}"
+                        class="track-item group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:bg-gray-800/80 dark:backdrop-blur-sm">
                         <div class="flex flex-col p-6 sm:flex-row sm:items-center">
                             <div
                                 class="relative mb-6 aspect-square w-full overflow-hidden rounded-xl sm:mb-0 sm:mr-6 sm:w-48">
@@ -323,6 +324,19 @@
                                         </svg>
                                     </button>
                                 </div>
+
+                                <!-- Индикатор количества лайков -->
+                                @if ($track->favorites_count > 0)
+                                    <div
+                                        class="absolute top-3 right-3 flex items-center rounded-full bg-red-500/90 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-3 w-3" fill="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path
+                                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                        </svg>
+                                        {{ $track->favorites_count }}
+                                    </div>
+                                @endif
                             </div>
                             <div class="flex-1">
                                 <div class="mb-4 flex flex-wrap items-start justify-between gap-2">
@@ -342,18 +356,18 @@
                                 </a>
                                 <div class="flex flex-wrap items-center justify-between gap-4">
                                     <div class="flex items-center gap-4">
-                                        <div class="flex items-center text-gray-500 dark:text-gray-400">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-5 w-5" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        <div class="flex items-center text-red-500 dark:text-red-400">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-5 w-5"
+                                                fill="currentColor" viewBox="0 0 24 24">
+                                                <path
                                                     d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                             </svg>
-                                            <span class="text-sm font-medium">10</span>
+                                            <span class="text-sm font-medium">{{ $track->favorites_count ?? 0 }}</span>
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-3">
                                         <span class="text-sm text-gray-500 dark:text-gray-400">Опубликовано:
-                                            {{ $track->created_at }}</span>
+                                            {{ $track->created_at->format('d.m.Y') }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -436,4 +450,53 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sortSelect = document.getElementById('trackSortSelect');
+            const tracksContainer = document.getElementById('tracksContainer');
+
+            sortSelect.addEventListener('change', function() {
+                const sortType = this.value;
+                const tracks = Array.from(tracksContainer.querySelectorAll('.track-item'));
+
+                tracks.sort((a, b) => {
+                    switch (sortType) {
+                        case 'newest':
+                            return parseInt(b.dataset.created) - parseInt(a.dataset.created);
+
+                        case 'oldest':
+                            return parseInt(a.dataset.created) - parseInt(b.dataset.created);
+
+                        case 'popular':
+                            return parseInt(b.dataset.favorites) - parseInt(a.dataset.favorites);
+
+                        case 'alphabetical':
+                            return a.dataset.title.localeCompare(b.dataset.title, 'ru');
+
+                        default:
+                            return 0;
+                    }
+                });
+
+                // Очищаем контейнер и добавляем отсортированные треки
+                tracksContainer.innerHTML = '';
+                tracks.forEach(track => {
+                    tracksContainer.appendChild(track);
+                });
+
+                // Добавляем анимацию появления
+                tracks.forEach((track, index) => {
+                    track.style.opacity = '0';
+                    track.style.transform = 'translateY(20px)';
+
+                    setTimeout(() => {
+                        track.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                        track.style.opacity = '1';
+                        track.style.transform = 'translateY(0)';
+                    }, index * 50);
+                });
+            });
+        });
+    </script>
 @endsection
