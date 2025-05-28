@@ -97,7 +97,7 @@ class TrackController extends Controller
             'size' => $audioFile->getSize(),
         ]);
 
-        return redirect()->route('tracks.show', $track)
+        return redirect()->route('profile.index', $track)
             ->with('success', 'Трек успешно загружен!');
     }
 
@@ -105,23 +105,23 @@ class TrackController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Track $track)
-    {
-        $track->load(['user', 'genre']);
+    // public function show(Track $track)
+    // {
+    //     $track->load(['user', 'genre']);
 
-        // Получаем плейлисты пользователя
-        $playlists = Auth::check() ? Auth::user()->playlists()->withCount('tracks')->get() : collect([]);
+    //     // Получаем плейлисты пользователя
+    //     $playlists = Auth::check() ? Auth::user()->playlists()->withCount('tracks')->get() : collect([]);
 
-        // Получаем похожие треки (того же жанра)
-        $similarTracks = Track::where('genre_id', $track->genre_id)
-            ->where('id', '!=', $track->id)
-            ->with('user')
-            ->inRandomOrder()
-            ->limit(5)
-            ->get();
+    //     // Получаем похожие треки (того же жанра)
+    //     $similarTracks = Track::where('genre_id', $track->genre_id)
+    //         ->where('id', '!=', $track->id)
+    //         ->with('user')
+    //         ->inRandomOrder()
+    //         ->limit(5)
+    //         ->get();
 
-        return view('track.show', compact('track', 'playlists', 'similarTracks'));
-    }
+    //     return view('track.show', compact('track', 'playlists', 'similarTracks'));
+    // }
 
     public function getTrackData($id)
     {
@@ -130,8 +130,6 @@ class TrackController extends Controller
 
         // Получаем файлы напрямую из базы данных
         $file = \DB::table('files')->first();
-
-        // dd($file);
 
         // Формируем URL к аудиофайлу
         $audioUrl = null;

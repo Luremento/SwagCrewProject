@@ -30,6 +30,12 @@
                     class="{{ request()->routeIs('forum.index') ? 'text-primary-600 dark:text-primary-400 font-medium' : 'text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400' }}">
                     Форум
                 </a>
+                @if (Auth::user() && Auth::user()->role == 'admin')
+                    <a href="{{ route('admin.dashboard') }}"
+                        class="{{ request()->routeIs('admin.dashboard') ? 'text-primary-600 dark:text-primary-400 font-medium' : 'text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400' }}">
+                        Панель администратора
+                    </a>
+                @endif
             </nav>
 
             <!-- Правая часть -->
@@ -132,8 +138,8 @@
                     <a href="{{ route('track.create') }}"
                         class="rounded-full bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-800">
                         <span class="hidden sm:inline">Загрузить трек</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:hidden" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:hidden" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
                     </a>

@@ -11,7 +11,9 @@ use App\Http\Controllers\{
     CommentController,
     PlaylistController
 };
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Middleware\IsAdmin;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -32,6 +34,7 @@ Route::delete('/thread/{id}', [App\Http\Controllers\ThreadController::class, 'de
 
 
 Route::get('/tracks', [TrackController::class, 'index'])->name('tracks.index');
+// Route::get('/tracks/{track}', [TrackController::class, 'show'])->name('tracks.show');
 Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/avatar-upload', [ProfileController::class, 'uploadAvatar'])->name('profile.avatar.upload');
@@ -68,6 +71,20 @@ Route::middleware('auth')->group(function () {
         Route::delete('/playlists/{playlist}/remove-track', [PlaylistController::class, 'removeTrack'])->name('playlists.remove-track');
         Route::post('/playlists/{playlist}/reorder-tracks', [PlaylistController::class, 'reorderTracks'])->name('playlists.reorder-tracks');
         Route::get('/playlists-list', [PlaylistController::class, 'getPlaylistsList'])->name('playlists.list');
+    });
+
+    Route::middleware(['auth', IsAdmin::class])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/', [AdminController::class, 'index'])->name('dashboard');
+        Route::get('/users', [AdminController::class, 'users'])->name('users');
+
+        // Управление пользователями
+        Route::post('/users/{user}/toggle-role', [AdminController::class, 'toggleUserRole'])->name('users.toggle-role');
+        Route::post('/users/{user}/toggle-block', [AdminController::class, 'toggleUserBlock'])->name('users.toggle-block');
+
+        // Экспорт
+        Route::get('/export/users/excel', [AdminController::class, 'exportUsersExcel'])->name('export.users.excel');
+        Route::get('/export/users/pdf', [AdminController::class, 'exportUsersPdf'])->name('export.users.pdf');
+        Route::get('/export/tracks/excel', [AdminController::class, 'exportTracksExcel'])->name('export.tracks.excel');
     });
 });
 

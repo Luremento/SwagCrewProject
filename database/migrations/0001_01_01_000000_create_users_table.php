@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->string('email')->unique();
             $table->string('avatar', 100)->nullable();
             $table->enum('role', ['admin', 'user'])->default('user');
+            $table->boolean('is_blocked')->default(false);
             $table->text('bio')->nullable();
             $table->string('password');
             $table->rememberToken();
