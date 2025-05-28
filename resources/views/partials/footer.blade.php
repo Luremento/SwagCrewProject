@@ -23,54 +23,16 @@
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Навигация</h3>
                 <ul class="mt-4 space-y-3">
                     <li>
-                        <a href="/"
+                        <a href="{{ route('index') }}"
                             class="text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400">Главная</a>
                     </li>
                     <li>
-                        <a href="/"
+                        <a href="{{ route('tracks.index') }}"
                             class="text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400">Треки</a>
                     </li>
                     <li>
-                        <a href="/"
+                        <a href="{{ route('forum.index') }}"
                             class="text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400">Форум</a>
-                    </li>
-                    <li>
-                        <a href="/"
-                            class="text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400">Категории</a>
-                    </li>
-                    <li>
-                        <a href="/"
-                            class="text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400">О
-                            нас</a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Категории -->
-            <div>
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Категории</h3>
-                <ul class="mt-4 space-y-3">
-                    <li>
-                        <a href="/"
-                            class="text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400">Электронная
-                            музыка</a>
-                    </li>
-                    <li>
-                        <a href="/"
-                            class="text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400">Хип-хоп</a>
-                    </li>
-                    <li>
-                        <a href="/"
-                            class="text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400">Рок</a>
-                    </li>
-                    <li>
-                        <a href="/"
-                            class="text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400">Инструментальная</a>
-                    </li>
-                    <li>
-                        <a href="/"
-                            class="text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400">Все
-                            категории</a>
                     </li>
                 </ul>
             </div>

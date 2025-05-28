@@ -99,7 +99,7 @@
                     </a>
                 @else
                     <!-- Уведомления -->
-                    <div class="relative">
+                    {{-- <div class="relative">
                         <button
                             class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -110,7 +110,7 @@
                             <span
                                 class="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary-600 text-xs font-bold text-white">3</span>
                         </button>
-                    </div>
+                    </div> --}}
 
                     <!-- Профиль пользователя -->
                     <div class="relative">
@@ -132,8 +132,8 @@
                     <a href="{{ route('track.create') }}"
                         class="rounded-full bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-800">
                         <span class="hidden sm:inline">Загрузить трек</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:hidden" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:hidden" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
                     </a>

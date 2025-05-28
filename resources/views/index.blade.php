@@ -34,25 +34,16 @@
                             Загружайте треки, общайтесь с другими музыкантами и получайте отзывы от сообщества. Ваша музыка
                             заслуживает быть услышанной.
                         </p>
-                        <div class="flex flex-wrap gap-4">
-                            <a href="{{ route('tracks.index') }}"
-                                class="group relative overflow-hidden rounded-full bg-white px-8 py-3 font-medium text-primary-600 shadow-lg transition-all duration-300 hover:bg-gray-100">
-                                <span class="relative z-10">Начать сейчас</span>
-                                <span
-                                    class="absolute left-0 top-0 -z-10 h-full w-0 rounded-full bg-gradient-to-r from-primary-100 to-primary-50 transition-all duration-300 group-hover:w-full"></span>
-                            </a>
-                            <a href="{{ route('tracks.index') }}"
-                                class="group relative overflow-hidden rounded-full bg-white/20 px-8 py-3 font-medium text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/30">
-                                <span class="relative z-10 flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                    </svg>
-                                    Как это работает
-                                </span>
-                            </a>
-                        </div>
+                        @guest
+                            <div class="flex flex-wrap gap-4">
+                                <a href="{{ route('tracks.index') }}"
+                                    class="group relative overflow-hidden rounded-full bg-white px-8 py-3 font-medium text-primary-600 shadow-lg transition-all duration-300 hover:bg-gray-100">
+                                    <span class="relative z-10">Начать сейчас</span>
+                                    <span
+                                        class="absolute left-0 top-0 -z-10 h-full w-0 rounded-full bg-gradient-to-r from-primary-100 to-primary-50 transition-all duration-300 group-hover:w-full"></span>
+                                </a>
+                            </div>
+                        @endguest
                     </div>
                     <div class="relative hidden lg:block">
                         <div class="relative mx-auto aspect-square max-w-md overflow-hidden rounded-2xl shadow-2xl">
@@ -311,68 +302,86 @@
             </a>
         </div>
 
-        <div class="space-y-6">
-            @foreach ($popularThreads as $item)
-                <div
-                    class="group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:bg-gray-800/80 dark:backdrop-blur-sm">
-                    <div class="p-6">
-                        <div class="mb-4 flex items-center justify-between">
-                            <div class="flex items-center">
-                                @if ($item->user->avatar)
-                                    <img src="{{ asset('storage/avatars/' . $item->user->avatar) }}" alt="Аватар"
-                                        class="mr-3 h-10 w-10 rounded-full">
-                                @else
-                                    <img src="{{ asset('img/default-avatar.webp') }}" alt="Аватар"
-                                        class="mr-3 h-10 w-10 rounded-full">
-                                @endif
-                                <div>
-                                    <a href="{{ route('profile.index', $item->user->id) }}"
-                                        class="font-medium text-gray-900 hover:text-primary-600 dark:text-white dark:hover:text-primary-400">{{ $item->user->name }}</a>
+        @if ($popularThreads->count() > 0)
+            <div class="space-y-6">
+                @foreach ($popularThreads as $item)
+                    <div
+                        class="group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:bg-gray-800/80 dark:backdrop-blur-sm">
+                        <div class="p-6">
+                            <div class="mb-4 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    @if ($item->user->avatar)
+                                        <img src="{{ asset('storage/avatars/' . $item->user->avatar) }}" alt="Аватар"
+                                            class="mr-3 h-10 w-10 rounded-full">
+                                    @else
+                                        <img src="{{ asset('img/default-avatar.webp') }}" alt="Аватар"
+                                            class="mr-3 h-10 w-10 rounded-full">
+                                    @endif
+                                    <div>
+                                        <a href="{{ route('profile.index', $item->user->id) }}"
+                                            class="font-medium text-gray-900 hover:text-primary-600 dark:text-white dark:hover:text-primary-400">{{ $item->user->name }}</a>
+                                    </div>
                                 </div>
-                            </div>
-                            <div
-                                class="flex items-center rounded-full bg-primary-50 px-3 py-1 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                                </svg>
-                                <span class="text-sm font-medium">{{ $item->category->name }}</span>
-                            </div>
-                        </div>
-                        <h3 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">
-                            <a href="{{ route('thread.show', $item->id) }}"
-                                class="hover:text-primary-600 dark:hover:text-primary-400">{{ $item->title }}</a>
-                        </h3>
-                        <p class="mb-4 text-gray-600 line-clamp-2 dark:text-gray-400">
-                            {{ $item->content }}
-                        </p>
-                        <div class="flex flex-wrap gap-2">
-                            @foreach ($item->tags as $tag)
-                                <span
-                                    class="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300">{{ $tag->name }}</span>
-                            @endforeach
-                        </div>
-                        <div class="mt-6 flex items-center justify-between">
-                            <div class="flex items-center gap-4">
-                                <div class="flex items-center text-gray-500 dark:text-gray-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-5 w-5" fill="none"
+                                <div
+                                    class="flex items-center rounded-full bg-primary-50 px-3 py-1 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                            d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                                     </svg>
-                                    <span class="text-sm font-medium">{{ $item->comments_count }}</span>
+                                    <span class="text-sm font-medium">{{ $item->category->name }}</span>
                                 </div>
                             </div>
-                            <a href="{{ route('thread.show', $item->id) }}"
-                                class="rounded-full bg-primary-50 px-4 py-2 text-sm font-medium text-primary-600 transition-colors hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50">
-                                Присоединиться
-                            </a>
+                            <h3 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">
+                                <a href="{{ route('thread.show', $item->id) }}"
+                                    class="hover:text-primary-600 dark:hover:text-primary-400">{{ $item->title }}</a>
+                            </h3>
+                            <p class="mb-4 text-gray-600 line-clamp-2 dark:text-gray-400">
+                                {{ $item->content }}
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach ($item->tags as $tag)
+                                    <span
+                                        class="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300">{{ $tag->name }}</span>
+                                @endforeach
+                            </div>
+                            <div class="mt-6 flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex items-center text-gray-500 dark:text-gray-400">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-5 w-5" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                        </svg>
+                                        <span class="text-sm font-medium">{{ $item->comments_count }}</span>
+                                    </div>
+                                </div>
+                                <a href="{{ route('thread.show', $item->id) }}"
+                                    class="rounded-full bg-primary-50 px-4 py-2 text-sm font-medium text-primary-600 transition-colors hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50">
+                                    Присоединиться
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
-            @endforeach
-        </div>
+                @endforeach
+            </div>
+        @else
+            <div class="rounded-2xl bg-gray-50 p-12 text-center dark:bg-gray-800/50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-16 w-16 text-gray-400" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+                <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">Пока нет обсуждений</h3>
+                <p class="mt-2 text-gray-500 dark:text-gray-400">Создайте первую тему и начните общение!</p>
+                @auth
+                    <a href="{{ route('forum.index') }}"
+                        class="mt-4 inline-flex items-center rounded-full bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700">
+                        Создать тему
+                    </a>
+                @endauth
+            </div>
+        @endif
     </div>
 
     @guest

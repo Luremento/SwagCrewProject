@@ -36,9 +36,13 @@
                         </label>
                         <div class="mt-1 relative rounded-md shadow-sm">
                             <input id="email" name="email" type="email" autocomplete="email" required
-                                class="block w-full rounded-lg border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
+                                value="{{ old('email') }}"
+                                class="block w-full rounded-lg border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500 @error('email') border-red-500 dark:border-red-500 @enderror"
                                 placeholder="email@example.com">
                         </div>
+                        @error('email')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <!-- Пароль -->
@@ -48,9 +52,12 @@
                         </label>
                         <div class="mt-1 relative rounded-md shadow-sm">
                             <input id="password" name="password" type="password" autocomplete="current-password" required
-                                class="block w-full rounded-lg border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
+                                class="block w-full rounded-lg border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500 @error('password') border-red-500 dark:border-red-500 @enderror"
                                 placeholder="Введите пароль">
                         </div>
+                        @error('password')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <!-- Кнопка входа -->

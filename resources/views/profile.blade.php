@@ -283,6 +283,7 @@
     <!-- Вкладки профиля -->
     <div class="mt-10">
         <!-- Содержимое вкладки "Треки" -->
+        <!-- Треки пользователя -->
         <div class="mt-8">
             <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
                 <h2 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
@@ -291,100 +292,141 @@
                         <span class="absolute -bottom-1 left-0 h-1 w-1/2 rounded bg-primary-500"></span>
                     </span>
                 </h2>
-                <div class="flex items-center">
-                    <span class="mr-3 text-gray-600 dark:text-gray-400">Сортировать:</span>
-                    <select id="trackSortSelect"
-                        class="rounded-full border-none bg-gray-100 px-4 py-2 text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-300">
-                        <option value="newest">Новые</option>
-                        <option value="popular">Популярные</option>
-                        <option value="oldest">Старые</option>
-                        <option value="alphabetical">По алфавиту</option>
-                    </select>
-                </div>
+                @if ($user->tracks->count() > 0)
+                    <div class="flex items-center">
+                        <span class="mr-3 text-gray-600 dark:text-gray-400">Сортировать:</span>
+                        <select id="trackSortSelect"
+                            class="rounded-full border-none bg-gray-100 px-4 py-2 text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-300">
+                            <option value="newest">Новые</option>
+                            <option value="popular">Популярные</option>
+                            <option value="oldest">Старые</option>
+                            <option value="alphabetical">По алфавиту</option>
+                        </select>
+                    </div>
+                @endif
             </div>
 
-            <div id="tracksContainer" class="space-y-6">
-                @foreach ($user->tracks as $track)
-                    <div data-track-id="{{ $track->id }}" data-created="{{ $track->created_at->timestamp }}"
-                        data-favorites="{{ $track->favorites_count ?? 0 }}" data-title="{{ strtolower($track->title) }}"
-                        class="track-item group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:bg-gray-800/80 dark:backdrop-blur-sm">
-                        <div class="flex flex-col p-6 sm:flex-row sm:items-center">
-                            <div
-                                class="relative mb-6 aspect-square w-full overflow-hidden rounded-xl sm:mb-0 sm:mr-6 sm:w-48">
-                                <img src="{{ asset('storage/' . $track->cover_image) }}" alt="Обложка трека"
-                                    class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110">
+            @if ($user->tracks->count() > 0)
+                <div id="tracksContainer" class="space-y-6">
+                    @foreach ($user->tracks as $track)
+                        <div data-track-id="{{ $track->id }}" data-created="{{ $track->created_at->timestamp }}"
+                            data-favorites="{{ $track->favorites_count ?? 0 }}"
+                            data-title="{{ strtolower($track->title) }}"
+                            class="track-item group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:bg-gray-800/80 dark:backdrop-blur-sm">
+                            <div class="flex flex-col p-6 sm:flex-row sm:items-center">
                                 <div
-                                    class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                                    <button
-                                        class="flex h-16 w-16 items-center justify-center rounded-full bg-primary-600/90 text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-primary-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                        </svg>
-                                    </button>
-                                </div>
-
-                                <!-- Индикатор количества лайков -->
-                                @if ($track->favorites_count > 0)
+                                    class="relative mb-6 aspect-square w-full overflow-hidden rounded-xl sm:mb-0 sm:mr-6 sm:w-48">
+                                    <img src="{{ asset('storage/' . $track->cover_image) }}" alt="Обложка трека"
+                                        class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110">
                                     <div
-                                        class="absolute top-3 right-3 flex items-center rounded-full bg-red-500/90 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-3 w-3" fill="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                        </svg>
-                                        {{ $track->favorites_count }}
+                                        class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                                        <button
+                                            class="flex h-16 w-16 items-center justify-center rounded-full bg-primary-600/90 text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-primary-600">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                            </svg>
+                                        </button>
                                     </div>
-                                @endif
-                            </div>
-                            <div class="flex-1">
-                                <div class="mb-4 flex flex-wrap items-start justify-between gap-2">
-                                    <div>
-                                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
-                                            {{ $track->title }}
-                                        </h3>
-                                    </div>
-                                </div>
-                                <div class="mb-4 flex flex-wrap gap-2">
-                                    <span
-                                        class="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300">{{ $track->genre->name }}</span>
-                                </div>
-                                <a href="{{ route('profile.index', $track->user->id) }}"
-                                    class="mb-6 text-gray-600 line-clamp-2 dark:text-gray-400">
-                                    {{ $track->user->name }}
-                                </a>
-                                <div class="flex flex-wrap items-center justify-between gap-4">
-                                    <div class="flex items-center gap-4">
-                                        <div class="flex items-center text-red-500 dark:text-red-400">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-5 w-5"
+
+                                    <!-- Индикатор количества лайков -->
+                                    @if ($track->favorites_count > 0)
+                                        <div
+                                            class="absolute top-3 right-3 flex items-center rounded-full bg-red-500/90 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-3 w-3"
                                                 fill="currentColor" viewBox="0 0 24 24">
                                                 <path
                                                     d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                             </svg>
-                                            <span class="text-sm font-medium">{{ $track->favorites_count ?? 0 }}</span>
+                                            {{ $track->favorites_count }}
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="flex-1">
+                                    <div class="mb-4 flex flex-wrap items-start justify-between gap-2">
+                                        <div>
+                                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
+                                                {{ $track->title }}
+                                            </h3>
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-3">
-                                        <span class="text-sm text-gray-500 dark:text-gray-400">Опубликовано:
-                                            {{ $track->created_at->format('d.m.Y') }}</span>
+                                    <div class="mb-4 flex flex-wrap gap-2">
+                                        <span
+                                            class="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300">{{ $track->genre->name }}</span>
+                                    </div>
+                                    <a href="{{ route('profile.index', $track->user->id) }}"
+                                        class="mb-6 text-gray-600 line-clamp-2 dark:text-gray-400">
+                                        {{ $track->user->name }}
+                                    </a>
+                                    <div class="flex flex-wrap items-center justify-between gap-4">
+                                        <div class="flex items-center gap-4">
+                                            <div class="flex items-center text-red-500 dark:text-red-400">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-5 w-5"
+                                                    fill="currentColor" viewBox="0 0 24 24">
+                                                    <path
+                                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                </svg>
+                                                <span
+                                                    class="text-sm font-medium">{{ $track->favorites_count ?? 0 }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <span class="text-sm text-gray-500 dark:text-gray-400">Опубликовано:
+                                                {{ $track->created_at->format('d.m.Y') }}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                @endforeach
-            </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="rounded-2xl bg-gray-50 p-12 text-center dark:bg-gray-800/50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-16 w-16 text-gray-400" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
+                    <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+                        @if (auth()->check() && auth()->id() === $user->id)
+                            У вас пока нет треков
+                        @else
+                            У пользователя пока нет треков
+                        @endif
+                    </h3>
+                    <p class="mt-2 text-gray-500 dark:text-gray-400">
+                        @if (auth()->check() && auth()->id() === $user->id)
+                            Загрузите свой первый трек и поделитесь музыкой с миром!
+                        @else
+                            Пользователь еще не загружал музыку
+                        @endif
+                    </p>
+                    @if (auth()->check() && auth()->id() === $user->id)
+                        <a href="{{ route('track.create') }}"
+                            class="mt-4 inline-flex items-center rounded-full bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                            Загрузить трек
+                        </a>
+                    @endif
+                </div>
+            @endif
+        </div>
 
-            <!-- Темы на форуме -->
-            <div class="mt-16 mb-8">
-                <h2 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white mb-8">
-                    <span class="relative">
-                        Темы на форуме
-                        <span class="absolute -bottom-1 left-0 h-1 w-1/2 rounded bg-primary-500"></span>
-                    </span>
-                </h2>
+        <!-- Темы на форуме -->
+        <div class="mt-16 mb-8">
+            <h2 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white mb-8">
+                <span class="relative">
+                    Темы на форуме
+                    <span class="absolute -bottom-1 left-0 h-1 w-1/2 rounded bg-primary-500"></span>
+                </span>
+            </h2>
 
+            @if ($topTopics->count() > 0)
                 <div class="space-y-4">
                     @foreach ($topTopics as $item)
                         <div
@@ -447,7 +489,40 @@
                         </div>
                     @endforeach
                 </div>
-            </div>
+            @else
+                <div class="rounded-2xl bg-gray-50 p-12 text-center dark:bg-gray-800/50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-16 w-16 text-gray-400" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    </svg>
+                    <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+                        @if (auth()->check() && auth()->id() === $user->id)
+                            У вас пока нет тем на форуме
+                        @else
+                            Пользователь пока не создавал тем
+                        @endif
+                    </h3>
+                    <p class="mt-2 text-gray-500 dark:text-gray-400">
+                        @if (auth()->check() && auth()->id() === $user->id)
+                            Создайте первую тему и начните общение с сообществом!
+                        @else
+                            Пользователь еще не участвовал в обсуждениях
+                        @endif
+                    </p>
+                    @if (auth()->check() && auth()->id() === $user->id)
+                        <a href="{{ route('forum.index') }}"
+                            class="mt-4 inline-flex items-center rounded-full bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                            Создать тему
+                        </a>
+                    @endif
+                </div>
+            @endif
         </div>
     </div>
 

@@ -31,6 +31,7 @@ Route::put('/thread/{id}', [App\Http\Controllers\ThreadController::class, 'updat
 Route::delete('/thread/{id}', [App\Http\Controllers\ThreadController::class, 'destroy'])->name('thread.destroy');
 
 
+Route::get('/tracks', [TrackController::class, 'index'])->name('tracks.index');
 Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/avatar-upload', [ProfileController::class, 'uploadAvatar'])->name('profile.avatar.upload');
@@ -41,7 +42,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/{user?}', [ProfileController::class, 'index'])->name('profile.index');
 
     Route::controller(TrackController::class)->group(function () {
-        Route::get('/tracks', 'index')->name('tracks.index');
         Route::get('/tracks/{id}/data', [TrackController::class, 'getTrackData'])->name('tracks.data');
         Route::get('/theme/track/search', 'search')->name('track.search');
         Route::get('/track/create', 'create')->name('track.create');
