@@ -69,7 +69,7 @@
                                             <h3 class="text-xl font-bold text-white">{{ $featuredTrack->title }}</h3>
                                             <p class="text-sm text-white/80">{{ $featuredTrack->user->name }}</p>
                                         </div>
-                                        <button
+                                        {{-- <button
                                             class="hero-play-button flex h-12 w-12 items-center justify-center rounded-full bg-primary-600/90 text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-primary-600"
                                             data-track-id="{{ $featuredTrack->id }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
@@ -77,7 +77,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                                             </svg>
-                                        </button>
+                                        </button> --}}
                                     </div>
                                 </div>
                             @else
@@ -178,7 +178,7 @@
                                     </div>
                                 @endif
                             </div>
-                            <div
+                            {{-- <div
                                 class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                                 <button
                                     class="play-button flex h-16 w-16 items-center justify-center rounded-full bg-primary-600/90 text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-primary-600"
@@ -189,7 +189,7 @@
                                             d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                                     </svg>
                                 </button>
-                            </div>
+                            </div> --}}
 
                             <!-- Индикатор популярности -->
                             @if ($popularTrack->favorites_count > 0)
