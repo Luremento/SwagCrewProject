@@ -24,21 +24,44 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'name' => fake()->unique()->userName(), // Уникальное имя пользователя
             'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'role' => 'user',
+            'is_blocked' => false,
+            'avatar' => null,
+            'bio' => fake()->optional()->paragraph(),
         ];
     }
 
     /**
-     * Indicate that the model's email address should be unverified.
+     * Indicate that the user should be an admin.
      */
-    public function unverified(): static
+    public function admin(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
+        return $this->state(fn(array $attributes) => [
+            'role' => 'admin',
+        ]);
+    }
+
+    /**
+     * Indicate that the user should be blocked.
+     */
+    public function blocked(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_blocked' => true,
+        ]);
+    }
+
+    /**
+     * Indicate that the user should have an avatar.
+     */
+    public function withAvatar(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'avatar' => 'avatars/' . fake()->uuid() . '.jpg',
         ]);
     }
 }
