@@ -61,19 +61,39 @@
                             </svg>
                             Редактировать
                         </button>
-                        <button type="button" id="delete-playlist-btn"
-                            class="inline-flex items-center rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:border-red-600 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-red-900/20">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            Удалить плейлист
-                        </button>
                     @endif
                 </div>
             </div>
         </div>
+
+        <!-- Сообщения об успехе/ошибке -->
+        @if (session('success'))
+            <div
+                class="mb-6 rounded-lg bg-green-100 border border-green-400 text-green-700 px-4 py-3 dark:bg-green-900 dark:border-green-600 dark:text-green-200">
+                <div class="flex">
+                    <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span class="ml-2">{{ session('success') }}</span>
+                </div>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div
+                class="mb-6 rounded-lg bg-red-100 border border-red-400 text-red-700 px-4 py-3 dark:bg-red-900 dark:border-red-600 dark:text-red-200">
+                <div class="flex">
+                    <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span class="ml-2">{{ session('error') }}</span>
+                </div>
+            </div>
+        @endif
 
         <!-- Список треков -->
         <div class="overflow-hidden rounded-xl bg-white shadow-md dark:bg-gray-800/80 dark:backdrop-blur-sm">
@@ -102,17 +122,6 @@
                                         </div>
                                     @endif
                                 </div>
-                                <button
-                                    class="play-button absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 opacity-0 transition-all duration-200 group-hover:opacity-100"
-                                    data-track-id="{{ $track->id }}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white drop-shadow-lg"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </button>
                             </div>
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-center justify-between">
@@ -122,24 +131,24 @@
                                     </a>
                                     <div class="ml-4 flex flex-shrink-0 items-center gap-3">
                                         @if (Auth::id() === $playlist->user_id)
-                                            <button type="button" data-track-id="{{ $track->id }}"
-                                                class="remove-from-playlist text-gray-400 hover:text-red-600 dark:hover:text-red-400 opacity-0 transition-opacity group-hover:opacity-100"
-                                                title="Удалить из плейлиста">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                                    viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                            </button>
+                                            <form action="{{ route('playlists.remove-track', $playlist) }}" method="POST"
+                                                class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <input type="hidden" name="track_id" value="{{ $track->id }}">
+                                                <button type="submit"
+                                                    class="text-gray-400 hover:text-red-600 dark:hover:text-red-400 opacity-0 transition-opacity group-hover:opacity-100"
+                                                    title="Удалить из плейлиста"
+                                                    onclick="return confirm('Вы уверены, что хотите удалить этот трек из плейлиста?')">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </form>
                                         @endif
-                                        <button type="button" data-track-id="{{ $track->id }}"
-                                            class="track-options text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 opacity-0 transition-opacity group-hover:opacity-100">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                                            </svg>
-                                        </button>
                                     </div>
                                 </div>
                                 <div class="mt-1 flex items-center text-sm">
@@ -185,9 +194,24 @@
 
                 <div
                     class="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all dark:bg-gray-800 sm:my-8 sm:w-full sm:max-w-lg sm:align-middle">
-                    <form id="edit-playlist-form" enctype="multipart/form-data">
+
+                    <form action="{{ route('playlists.update', $playlist) }}" method="POST"
+                        enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
+
+                        <!-- Отображение ошибок валидации -->
+                        @if ($errors->any())
+                            <div
+                                class="mx-6 mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded dark:bg-red-900 dark:border-red-600 dark:text-red-200">
+                                <ul class="list-disc list-inside">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
                         <div class="bg-white px-4 pt-5 pb-4 dark:bg-gray-800 sm:p-6 sm:pb-4">
                             <div class="sm:flex sm:items-start">
                                 <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
@@ -196,44 +220,81 @@
                                     </h3>
                                     <div class="mt-4 space-y-4">
                                         <div>
-                                            <label for="playlist-name"
+                                            <label for="edit-playlist-name"
                                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                                 Название плейлиста
                                             </label>
-                                            <input type="text" id="playlist-name" name="name"
-                                                value="{{ $playlist->name }}"
-                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm"
+                                            <input type="text" id="edit-playlist-name" name="name"
+                                                value="{{ old('name', $playlist->name) }}"
+                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm @error('name') border-red-500 @enderror"
                                                 required>
+                                            @error('name')
+                                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                            @enderror
                                         </div>
 
                                         <div>
-                                            <label for="playlist-description"
+                                            <label for="edit-playlist-description"
                                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                                 Описание
                                             </label>
-                                            <textarea id="playlist-description" name="description" rows="3"
-                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">{{ $playlist->description }}</textarea>
+                                            <textarea id="edit-playlist-description" name="description" rows="3"
+                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm @error('description') border-red-500 @enderror"
+                                                placeholder="Добавьте описание плейлиста">{{ old('description', $playlist->description) }}</textarea>
+                                            @error('description')
+                                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                            @enderror
                                         </div>
 
                                         <div>
-                                            <label for="playlist-cover"
+                                            <label for="edit-playlist-cover"
                                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                                 Обложка плейлиста
                                             </label>
-                                            <input type="file" id="playlist-cover" name="cover_image"
-                                                accept="image/*"
-                                                class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 dark:text-gray-400 dark:file:bg-primary-900/30 dark:file:text-primary-400">
+                                            <div class="mt-1 flex items-center space-x-4">
+                                                <div
+                                                    class="h-16 w-16 overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
+                                                    @if ($playlist->cover_image)
+                                                        <img src="{{ asset('storage/' . $playlist->cover_image) }}"
+                                                            alt="Текущая обложка" class="h-full w-full object-cover">
+                                                    @else
+                                                        <div class="flex h-full w-full items-center justify-center">
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                class="h-6 w-6 text-gray-400" fill="none"
+                                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                            </svg>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div class="flex-1">
+                                                    <input type="file" id="edit-playlist-cover" name="cover_image"
+                                                        accept="image/*"
+                                                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 dark:text-gray-400 dark:file:bg-primary-900/30 dark:file:text-primary-400 @error('cover_image') border-red-500 @enderror">
+                                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">PNG, JPG до
+                                                        2MB</p>
+                                                    @error('cover_image')
+                                                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">
+                                                            {{ $message }}</p>
+                                                    @enderror
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div class="flex items-center">
-                                            <input type="checkbox" id="playlist-public" name="is_public" value="1"
-                                                {{ $playlist->is_public ? 'checked' : '' }}
+                                            <input type="checkbox" id="edit-playlist-public" name="is_public"
+                                                value="1"
+                                                {{ old('is_public', $playlist->is_public) ? 'checked' : '' }}
                                                 class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700">
-                                            <label for="playlist-public"
+                                            <label for="edit-playlist-public"
                                                 class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                                                 Публичный плейлист
                                             </label>
                                         </div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Публичные плейлисты видны всем
+                                            пользователям, приватные - только вам.</p>
                                     </div>
                                 </div>
                             </div>
@@ -241,7 +302,7 @@
                         <div class="bg-gray-50 px-4 py-3 dark:bg-gray-700 sm:flex sm:flex-row-reverse sm:px-6">
                             <button type="submit"
                                 class="inline-flex w-full justify-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm">
-                                Сохранить
+                                Сохранить изменения
                             </button>
                             <button type="button" id="cancel-edit"
                                 class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 sm:mt-0 sm:w-auto sm:text-sm">
@@ -252,256 +313,54 @@
                 </div>
             </div>
         </div>
-
-        <!-- Модальное окно подтверждения удаления плейлиста -->
-        <div id="delete-playlist-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-            <div class="flex min-h-screen items-center justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" id="delete-modal-backdrop"></div>
-
-                <span class="hidden sm:inline-block sm:h-screen sm:align-middle">&#8203;</span>
-
-                <div
-                    class="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all dark:bg-gray-800 sm:my-8 sm:w-full sm:max-w-lg sm:align-middle">
-                    <div class="bg-white px-4 pt-5 pb-4 dark:bg-gray-800 sm:p-6 sm:pb-4">
-                        <div class="sm:flex sm:items-start">
-                            <div
-                                class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 sm:mx-0 sm:h-10 sm:w-10">
-                                <svg class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                                </svg>
-                            </div>
-                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">
-                                    Удалить плейлист
-                                </h3>
-                                <div class="mt-2">
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                                        Вы уверены, что хотите удалить плейлист "{{ $playlist->name }}"? Это действие
-                                        нельзя отменить.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 px-4 py-3 dark:bg-gray-700 sm:flex sm:flex-row-reverse sm:px-6">
-                        <button type="button" id="confirm-delete-playlist"
-                            class="inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm">
-                            Удалить
-                        </button>
-                        <button type="button" id="cancel-delete-playlist"
-                            class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 sm:mt-0 sm:w-auto sm:text-sm">
-                            Отмена
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
     @endif
 
-    <!-- Подключаем компоненты -->
-    @include('components.playlist-selector')
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Получаем CSRF токен
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-            // Обработчик для кнопки "Воспроизвести все"
-            const playAllBtn = document.getElementById('play-all-btn');
-            if (playAllBtn) {
-                playAllBtn.addEventListener('click', function() {
-                    const firstTrackButton = document.querySelector('.play-button');
-                    if (firstTrackButton) {
-                        firstTrackButton.click();
-                    }
-                });
-            }
-
-            @if (Auth::id() === $playlist->user_id)
-                // Модальное окно редактирования плейлиста
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Простое открытие/закрытие модального окна
                 const editPlaylistBtn = document.getElementById('edit-playlist-btn');
                 const editPlaylistModal = document.getElementById('edit-playlist-modal');
-                const editPlaylistForm = document.getElementById('edit-playlist-form');
                 const cancelEditBtn = document.getElementById('cancel-edit');
                 const modalBackdrop = document.getElementById('modal-backdrop');
 
-                // Открытие модального окна редактирования
-                editPlaylistBtn.addEventListener('click', function() {
-                    editPlaylistModal.classList.remove('hidden');
-                    document.body.style.overflow = 'hidden';
-                });
+                if (editPlaylistBtn && editPlaylistModal) {
+                    // Открытие модального окна
+                    editPlaylistBtn.addEventListener('click', function() {
+                        editPlaylistModal.classList.remove('hidden');
+                        document.body.style.overflow = 'hidden';
+                    });
 
-                // Закрытие модального окна
-                function closeEditModal() {
-                    editPlaylistModal.classList.add('hidden');
-                    document.body.style.overflow = 'auto';
-                }
+                    // Закрытие модального окна
+                    function closeModal() {
+                        editPlaylistModal.classList.add('hidden');
+                        document.body.style.overflow = 'auto';
+                    }
 
-                cancelEditBtn.addEventListener('click', closeEditModal);
-                modalBackdrop.addEventListener('click', closeEditModal);
+                    if (cancelEditBtn) {
+                        cancelEditBtn.addEventListener('click', closeModal);
+                    }
 
-                // Обработка формы редактирования
-                editPlaylistForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
+                    if (modalBackdrop) {
+                        modalBackdrop.addEventListener('click', closeModal);
+                    }
 
-                    const formData = new FormData(this);
-
-                    fetch(`/playlists/{{ $playlist->id }}`, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': csrfToken,
-                                'X-HTTP-Method-Override': 'PUT'
-                            },
-                            body: formData
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                window.location.reload();
-                            } else {
-                                alert('Произошла ошибка при обновлении плейлиста');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Ошибка:', error);
-                            alert('Произошла ошибка при обновлении плейлиста');
-                        });
-                });
-
-                // Модальное окно удаления плейлиста
-                const deletePlaylistBtn = document.getElementById('delete-playlist-btn');
-                const deletePlaylistModal = document.getElementById('delete-playlist-modal');
-                const confirmDeleteBtn = document.getElementById('confirm-delete-playlist');
-                const cancelDeleteBtn = document.getElementById('cancel-delete-playlist');
-                const deleteModalBackdrop = document.getElementById('delete-modal-backdrop');
-
-                // Открытие модального окна удаления
-                deletePlaylistBtn.addEventListener('click', function() {
-                    deletePlaylistModal.classList.remove('hidden');
-                    document.body.style.overflow = 'hidden';
-                });
-
-                // Закрытие модального окна удаления
-                function closeDeleteModal() {
-                    deletePlaylistModal.classList.add('hidden');
-                    document.body.style.overflow = 'auto';
-                }
-
-                cancelDeleteBtn.addEventListener('click', closeDeleteModal);
-                deleteModalBackdrop.addEventListener('click', closeDeleteModal);
-
-                // Подтверждение удаления плейлиста
-                confirmDeleteBtn.addEventListener('click', function() {
-                    fetch(`/playlists/{{ $playlist->id }}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': csrfToken
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                window.location.href = '/playlists';
-                            } else {
-                                alert('Произошла ошибка при удалении плейлиста');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Ошибка:', error);
-                            alert('Произошла ошибка при удалении плейлиста');
-                        });
-                });
-
-                // Обработчик для удаления трека из плейлиста
-                document.querySelectorAll('.remove-from-playlist').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const trackId = this.getAttribute('data-track-id');
-                        const trackElement = this.closest('[data-track-id]');
-
-                        if (confirm('Вы уверены, что хотите удалить этот трек из плейлиста?')) {
-                            fetch(`/playlists/{{ $playlist->id }}/remove-track`, {
-                                    method: 'DELETE',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'X-CSRF-TOKEN': csrfToken
-                                    },
-                                    body: JSON.stringify({
-                                        track_id: trackId
-                                    })
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        // Удаляем элемент из DOM с анимацией
-                                        trackElement.style.transition =
-                                            'opacity 0.3s ease-out, transform 0.3s ease-out';
-                                        trackElement.style.opacity = '0';
-                                        trackElement.style.transform = 'translateX(-100%)';
-
-                                        setTimeout(() => {
-                                            trackElement.remove();
-
-                                            // Проверяем, остались ли треки
-                                            const remainingTracks = document
-                                                .querySelectorAll('[data-track-id]');
-                                            if (remainingTracks.length === 0) {
-                                                // Показываем пустое состояние
-                                                const tracksList = document
-                                                    .getElementById('tracks-list');
-                                                tracksList.innerHTML = `
-                                                <div class="px-6 py-8 text-center text-gray-500 dark:text-gray-400" id="empty-state">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto mb-4 h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                                                    </svg>
-                                                    <p class="text-lg font-medium">В этом плейлисте пока нет треков</p>
-                                                    <p class="mt-2">Добавьте треки, чтобы начать слушать музыку</p>
-                                                </div>
-                                            `;
-
-                                                // Скрываем кнопку "Воспроизвести все"
-                                                const playAllBtn = document
-                                                    .getElementById('play-all-btn');
-                                                if (playAllBtn) {
-                                                    playAllBtn.style.display = 'none';
-                                                }
-                                            }
-                                        }, 300);
-                                    } else {
-                                        alert(
-                                            'Произошла ошибка при удалении трека из плейлиста');
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Ошибка при удалении трека из плейлиста:',
-                                        error);
-                                    alert(
-                                        'Произошла ошибка при удалении трека из плейлиста. Пожалуйста, попробуйте еще раз.');
-                                });
+                    // Закрытие по Escape
+                    document.addEventListener('keydown', function(e) {
+                        if (e.key === 'Escape' && !editPlaylistModal.classList.contains('hidden')) {
+                            closeModal();
                         }
                     });
-                });
-            @endif
-
-            // Закрытие модальных окон по нажатию Escape
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    const editModal = document.getElementById('edit-playlist-modal');
-                    const deleteModal = document.getElementById('delete-playlist-modal');
-
-                    if (editModal && !editModal.classList.contains('hidden')) {
-                        editModal.classList.add('hidden');
-                        document.body.style.overflow = 'auto';
-                    }
-
-                    if (deleteModal && !deleteModal.classList.contains('hidden')) {
-                        deleteModal.classList.add('hidden');
-                        document.body.style.overflow = 'auto';
-                    }
                 }
+
+                // Автоматическое открытие модального окна при наличии ошибок валидации
+                @if ($errors->any())
+                    if (editPlaylistModal) {
+                        editPlaylistModal.classList.remove('hidden');
+                        document.body.style.overflow = 'hidden';
+                    }
+                @endif
             });
-        });
-    </script>
+        </script>
+    @endpush
 @endsection

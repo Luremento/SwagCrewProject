@@ -312,23 +312,78 @@
                         <div data-track-id="{{ $track->id }}" data-created="{{ $track->created_at->timestamp }}"
                             data-favorites="{{ $track->favorites_count ?? 0 }}"
                             data-title="{{ strtolower($track->title) }}"
-                            class="track-item group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:bg-gray-800/80 dark:backdrop-blur-sm">
+                            class="track-item group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:bg-gray-800/80 dark:backdrop-blur-sm {{ $track->trashed() ? 'opacity-75 border-2 border-red-300 dark:border-red-600' : '' }}">
+
+                            <!-- Метка удаленного трека (только для мягко удаленных) -->
+                            @if ($track->trashed())
+                                <div
+                                    class="bg-red-100 dark:bg-red-900/30 border-b border-red-200 dark:border-red-700 px-4 py-2">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center text-red-700 dark:text-red-300">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                            <span class="font-medium">Трек в корзине</span>
+                                            <span
+                                                class="ml-2 text-sm">{{ $track->deleted_at->format('d.m.Y H:i') }}</span>
+                                        </div>
+
+                                        @if (Auth::check() && Auth::id() === $track->user_id)
+                                            <form action="{{ route('tracks.restore', $track->id) }}" method="POST"
+                                                class="inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit"
+                                                    class="inline-flex items-center rounded-md bg-green-600 px-3 py-1 text-xs font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200"
+                                                    onclick="return confirm('Восстановить трек &quot;{{ $track->title }}&quot;?')"
+                                                    title="Восстановить трек">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                                    </svg>
+                                                    Восстановить
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
+
                             <div class="flex flex-col p-6 sm:flex-row sm:items-center">
                                 <div
                                     class="relative mb-6 aspect-square w-full overflow-hidden rounded-xl sm:mb-0 sm:mr-6 sm:w-48">
                                     <img src="{{ asset('storage/' . $track->cover_image) }}" alt="Обложка трека"
-                                        class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110">
-                                    <div
-                                        class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                                        <button
-                                            class="flex h-16 w-16 items-center justify-center rounded-full bg-primary-600/90 text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-primary-600">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                            </svg>
-                                        </button>
-                                    </div>
+                                        class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 {{ $track->trashed() ? 'grayscale' : '' }}">
+
+                                    @if (!$track->trashed())
+                                        <div
+                                            class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                                            <button
+                                                class="flex h-16 w-16 items-center justify-center rounded-full bg-primary-600/90 text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-primary-600">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    @else
+                                        <!-- Оверлей для удаленного трека -->
+                                        <div class="absolute inset-0 flex items-center justify-center bg-black/60">
+                                            <div class="text-center text-white">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2"
+                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                                <span class="text-sm font-medium">В корзине</span>
+                                            </div>
+                                        </div>
+                                    @endif
 
                                     <!-- Индикатор количества лайков -->
                                     @if ($track->favorites_count > 0)
@@ -343,22 +398,69 @@
                                         </div>
                                     @endif
                                 </div>
+
                                 <div class="flex-1">
                                     <div class="mb-4 flex flex-wrap items-start justify-between gap-2">
                                         <div>
-                                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
+                                            <h3
+                                                class="text-2xl font-bold text-gray-900 dark:text-white {{ $track->trashed() ? 'line-through' : '' }}">
                                                 {{ $track->title }}
                                             </h3>
+                                            @if ($track->trashed())
+                                                <span
+                                                    class="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800 dark:bg-red-900/30 dark:text-red-300 mt-1">
+                                                    В корзине {{ $track->deleted_at->diffForHumans() }}
+                                                </span>
+                                            @endif
                                         </div>
+
+                                        <!-- Кнопки управления треком -->
+                                        @if (Auth::check() && (Auth::user()->role === 'admin' || Auth::id() === $track->user_id) && !$track->trashed())
+                                            <div class="flex items-center gap-2">
+                                                <!-- Кнопка удаления -->
+                                                <form action="{{ route('tracks.soft-delete', $track) }}" method="POST"
+                                                    class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                        class="inline-flex items-center rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200"
+                                                        title="{{ Auth::user()->role === 'admin' ? 'Удалить трек навсегда (Администратор)' : 'Переместить в корзину' }}"
+                                                        onclick="return confirm('{{ Auth::user()->role === 'admin' ? 'ВНИМАНИЕ! Администратор удаляет треки НАВСЕГДА. Это действие нельзя отменить!' : 'Переместить трек в корзину? Вы сможете восстановить его позже.' }}')">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1"
+                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                        @if (Auth::user()->role === 'admin')
+                                                            Удалить навсегда
+                                                        @else
+                                                            В корзину
+                                                        @endif
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        @endif
                                     </div>
+
                                     <div class="mb-4 flex flex-wrap gap-2">
                                         <span
-                                            class="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300">{{ $track->genre->name }}</span>
+                                            class="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                                            {{ $track->genre->name }}
+                                        </span>
+                                        @if ($track->trashed())
+                                            <span
+                                                class="rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-700 dark:bg-red-900/30 dark:text-red-300">
+                                                В корзине
+                                            </span>
+                                        @endif
                                     </div>
+
                                     <a href="{{ route('profile.index', $track->user->id) }}"
                                         class="mb-6 text-gray-600 line-clamp-2 dark:text-gray-400">
                                         {{ $track->user->name }}
                                     </a>
+
                                     <div class="flex flex-wrap items-center justify-between gap-4">
                                         <div class="flex items-center gap-4">
                                             <div class="flex items-center text-red-500 dark:text-red-400">
@@ -372,8 +474,14 @@
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-3">
-                                            <span class="text-sm text-gray-500 dark:text-gray-400">Опубликовано:
-                                                {{ $track->created_at->format('d.m.Y') }}</span>
+                                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                                                Опубликовано: {{ $track->created_at->format('d.m.Y') }}
+                                            </span>
+                                            @if ($track->trashed())
+                                                <span class="text-sm text-red-500 dark:text-red-400">
+                                                    В корзине: {{ $track->deleted_at->format('d.m.Y') }}
+                                                </span>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -381,41 +489,52 @@
                         </div>
                     @endforeach
                 </div>
+
+                <!-- Информационное сообщение о треках в корзине -->
+                @if ($canViewDeletedTracks && $user->tracks->where('deleted_at', '!=', null)->count() > 0)
+                    <div
+                        class="mt-6 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
+                        <div class="flex">
+                            <svg class="h-5 w-5 text-yellow-400 mr-2 flex-shrink-0 mt-0.5" fill="currentColor"
+                                viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <div class="text-sm text-yellow-700 dark:text-yellow-300">
+                                <div class="font-medium">Треки в корзине</div>
+                                <div class="mt-1">
+                                    {{ $user->tracks->where('deleted_at', '!=', null)->count() }}
+                                    {{ trans_choice('трек находится|трека находятся|треков находятся', $user->tracks->where('deleted_at', '!=', null)->count()) }}
+                                    в корзине.
+                                    Вы можете восстановить их в любое время.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
             @else
-                <div class="rounded-2xl bg-gray-50 p-12 text-center dark:bg-gray-800/50">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-16 w-16 text-gray-400" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                     </svg>
-                    <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">
-                        @if (auth()->check() && auth()->id() === $user->id)
-                            У вас пока нет треков
+                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">Нет треков</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        @if (Auth::check() && Auth::id() === $user->id)
+                            Вы еще не загрузили ни одного трека.
                         @else
-                            У пользователя пока нет треков
-                        @endif
-                    </h3>
-                    <p class="mt-2 text-gray-500 dark:text-gray-400">
-                        @if (auth()->check() && auth()->id() === $user->id)
-                            Загрузите свой первый трек и поделитесь музыкой с миром!
-                        @else
-                            Пользователь еще не загружал музыку
+                            Этот пользователь еще не загрузил ни одного трека.
                         @endif
                     </p>
-                    @if (auth()->check() && auth()->id() === $user->id)
-                        <a href="{{ route('track.create') }}"
-                            class="mt-4 inline-flex items-center rounded-full bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v16m8-8H4" />
-                            </svg>
-                            Загрузить трек
-                        </a>
-                    @endif
                 </div>
             @endif
+
+
+
         </div>
+
 
         <!-- Темы на форуме -->
         <div class="mt-16 mb-8">

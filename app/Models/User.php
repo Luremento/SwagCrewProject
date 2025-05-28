@@ -47,6 +47,21 @@ class User extends Authenticatable
         ];
     }
 
+    public function hasRole($roles): bool
+    {
+        // Если передана одна роль в виде строки
+        if (is_string($roles)) {
+            return $this->role === $roles;
+        }
+
+        // Если передан массив ролей
+        if (is_array($roles)) {
+            return in_array($this->role, $roles);
+        }
+
+        return false;
+    }
+
     // Кто подписан
     public function followers()
     {

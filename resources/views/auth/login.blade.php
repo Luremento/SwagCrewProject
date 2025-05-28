@@ -3,6 +3,7 @@
 @section('title', 'Вход')
 
 @section('content')
+
     <div class="w-full max-w-md">
         <div class="mb-8 text-center">
             <a href="/" class="inline-flex items-center">
@@ -28,7 +29,23 @@
             <div class="px-6 py-8 sm:px-10">
                 <form class="space-y-6" action="{{ route('login') }}" method="POST">
                     @csrf
-
+                    @if ($errors->has('blocked'))
+                        <div class="mb-4 rounded-lg bg-red-50 p-4 text-red-700 dark:bg-red-900/50 dark:text-red-200">
+                            <div class="flex">
+                                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium">Аккаунт заблокирован</h3>
+                                    <div class="mt-2 text-sm">
+                                        {{ $errors->first('blocked') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                     <!-- Email -->
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">

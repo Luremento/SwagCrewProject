@@ -116,7 +116,7 @@
                                 <!-- Выпадающее меню -->
                                 <div x-show="open" @click.away="open = false"
                                     class="absolute right-0 mt-2 w-48 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700">
-                                    @if (Auth::id() === $thread->user_id || (Auth::check() && Auth::user()->hasRole('admin')))
+                                    @if (Auth::id() === $thread->user_id || (Auth::check() && Auth::user()->role === 'admin'))
                                         <a href="{{ route('thread.edit', $thread->id) }}"
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
                                             <div class="flex items-center">
@@ -146,17 +146,6 @@
                                             </button>
                                         </form>
                                     @endif
-                                    <a href="#"
-                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
-                                        <div class="flex items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                                            </svg>
-                                            Сохранить
-                                        </div>
-                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -1057,7 +1046,7 @@
                                 searchTimeout = setTimeout(() => {
                                     fetch(
                                             `/theme/track/search?query=${encodeURIComponent(this.value)}`
-                                            )
+                                        )
                                         .then(response => response.json())
                                         .then(data => {
                                             trackResults.querySelector('div')
@@ -1163,10 +1152,10 @@
                                 <div class="mr-3 h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700">
                                     ${cover ? `<img src="${storageBaseUrl}/${cover}" alt="Обложка трека" class="h-full w-full object-cover">` :
                                     `<div class="flex h-full w-full items-center justify-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                                                </svg>
-                                            </div>`}
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                                                        </svg>
+                                                    </div>`}
                                 </div>
                                 <div>
                                     <p class="text-sm font-medium text-gray-900 dark:text-white">${title}</p>
@@ -1337,7 +1326,7 @@
                                 searchTimeout = setTimeout(() => {
                                     fetch(
                                             `/theme/track/search?query=${encodeURIComponent(this.value)}`
-                                            )
+                                        )
                                         .then(response => response.json())
                                         .then(data => {
                                             trackResults.querySelector('div')
@@ -1452,10 +1441,10 @@
                             <div class="mr-3 h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700">
                                 ${cover ? `<img src="${storageBaseUrl}/${cover}" alt="Обложка трека" class="h-full w-full object-cover">` :
                                 `<div class="flex h-full w-full items-center justify-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                                            </svg>
-                                        </div>`}
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                                                    </svg>
+                                                </div>`}
                             </div>
                             <div>
                                 <p class="text-sm font-medium text-gray-900 dark:text-white">${title}</p>

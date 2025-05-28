@@ -21,17 +21,36 @@ class ProfileController extends Controller
         if ($user) {
             $profileUser = User::where('id', $user)
                 ->orWhere('name', $user)
-                ->with([
-                    'tracks' => function ($query) {
-                        $query->withCount('favorites')->with('genre');
-                    }
-                ])
                 ->firstOrFail();
         } else {
             $profileUser = Auth::user();
+        }
+
+        // Определяем, может ли текущий пользователь видеть удаленные треки
+        $canViewDeletedTracks = Auth::check() && (
+            Auth::id() === $profileUser->id || // Владелец профиля
+            Auth::user()->role === 'admin'     // Администратор
+        );
+
+        // Загружаем треки в зависимости от прав доступа
+        if ($canViewDeletedTracks) {
+            // Загружаем все треки включая удаленные
             $profileUser->load([
                 'tracks' => function ($query) {
-                    $query->withCount('favorites')->with('genre');
+                    $query->withTrashed()
+                        ->withCount('favorites')
+                        ->with('genre')
+                        ->orderByRaw('deleted_at IS NULL DESC') // Сначала активные, потом удаленные
+                        ->orderBy('created_at', 'desc');
+                }
+            ]);
+        } else {
+            // Загружаем только активные треки
+            $profileUser->load([
+                'tracks' => function ($query) {
+                    $query->withCount('favorites')
+                        ->with('genre')
+                        ->orderBy('created_at', 'desc');
                 }
             ]);
         }
@@ -44,7 +63,8 @@ class ProfileController extends Controller
 
         return view('profile', [
             'user' => $profileUser,
-            'topTopics' => $topTopics
+            'topTopics' => $topTopics,
+            'canViewDeletedTracks' => $canViewDeletedTracks
         ]);
     }
 

@@ -68,7 +68,9 @@ class PlaylistController extends Controller
         $playlist->user_id = Auth::id();
         $playlist->name = $request->name;
         $playlist->description = $request->description;
-        $playlist->is_public = $request->has('is_public') ? true : false;
+
+        // ИСПРАВЛЕНИЕ: Правильная обработка чекбокса
+        $playlist->is_public = $request->boolean('is_public');
 
         // Обработка загрузки обложки
         if ($request->hasFile('cover_image')) {
@@ -83,17 +85,31 @@ class PlaylistController extends Controller
             $trackId = $request->redirect_with_track_id;
             $playlist->tracks()->attach($trackId, ['position' => 1]);
 
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Плейлист успешно создан и трек добавлен!',
+                    'playlist' => $playlist
+                ], 201);
+            }
+
             return redirect()->back()->with('success', 'Плейлист успешно создан и трек добавлен!');
         }
 
         // Проверяем, был ли запрос AJAX или ожидается JSON
         if ($request->ajax() || $request->wantsJson()) {
-            return response()->json($playlist, 201);
+            return response()->json([
+                'success' => true,
+                'message' => 'Плейлист успешно создан!',
+                'playlist' => $playlist,
+                'redirect_url' => route('playlists.show', $playlist)
+            ], 201);
         }
 
         // Если это обычная отправка формы, перенаправляем на страницу плейлиста
         return redirect()->route('playlists.show', $playlist)->with('success', 'Плейлист успешно создан!');
     }
+
 
     /**
      * Display the specified resource.
@@ -105,9 +121,13 @@ class PlaylistController extends Controller
             abort(403, 'У вас нет доступа к этому плейлисту');
         }
 
-        $playlist->load(['tracks' => function ($query) {
-            $query->orderBy('playlist_track.position', 'asc');
-        }, 'tracks.user', 'tracks.genre']);
+        $playlist->load([
+            'tracks' => function ($query) {
+                $query->orderBy('playlist_track.position', 'asc');
+            },
+            'tracks.user',
+            'tracks.genre'
+        ]);
 
         return view('playlist.show', compact('playlist'));
     }
@@ -130,40 +150,39 @@ class PlaylistController extends Controller
      */
     public function update(Request $request, Playlist $playlist)
     {
-        // Проверяем, что пользователь является владельцем плейлиста
+        // Проверяем права доступа
         if ($playlist->user_id !== Auth::id()) {
-            return response()->json(['error' => 'У вас нет прав на редактирование этого плейлиста'], 403);
+            abort(403, 'У вас нет прав для редактирования этого плейлиста');
         }
 
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'name' => 'required|string|max:100',
-            'description' => 'nullable|string',
-            'cover_image' => 'nullable|image|max:2048', // макс. 2MB
+            'description' => 'nullable|string|max:500',
+            'cover_image' => 'nullable|image|max:2048',
             'is_public' => 'nullable|boolean',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
+        // Обновляем основные поля
         $playlist->name = $request->name;
         $playlist->description = $request->description;
-        $playlist->is_public = $request->has('is_public') ? true : false;
+        $playlist->is_public = $request->boolean('is_public');
 
         // Обработка загрузки новой обложки
         if ($request->hasFile('cover_image')) {
-            // Удаляем старую обложку, если она есть
+            // Удаляем старую обложку, если она существует
             if ($playlist->cover_image) {
                 Storage::disk('public')->delete($playlist->cover_image);
             }
 
+            // Загружаем новую обложку
             $coverPath = $request->file('cover_image')->store('playlist_covers', 'public');
             $playlist->cover_image = $coverPath;
         }
 
         $playlist->save();
 
-        return response()->json($playlist);
+        return redirect()->route('playlists.show', $playlist)
+            ->with('success', 'Плейлист успешно обновлен!');
     }
 
     /**
@@ -238,31 +257,22 @@ class PlaylistController extends Controller
      */
     public function removeTrack(Request $request, Playlist $playlist)
     {
-        // Проверяем, что пользователь является владельцем плейлиста
+        // Проверяем права доступа
         if ($playlist->user_id !== Auth::id()) {
-            return response()->json(['error' => 'У вас нет прав на редактирование этого плейлиста'], 403);
+            abort(403, 'У вас нет прав для изменения этого плейлиста');
         }
 
-        $validator = Validator::make($request->all(), [
-            'track_id' => 'required|exists:tracks,id',
+        $request->validate([
+            'track_id' => 'required|exists:tracks,id'
         ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
 
         $trackId = $request->track_id;
 
         // Удаляем трек из плейлиста
         $playlist->tracks()->detach($trackId);
 
-        // Перенумеровываем позиции треков
-        $tracks = $playlist->tracks()->orderBy('playlist_track.position')->get();
-        foreach ($tracks as $index => $track) {
-            $playlist->tracks()->updateExistingPivot($track->id, ['position' => $index + 1]);
-        }
-
-        return response()->json(['message' => 'Трек успешно удален из плейлиста']);
+        return redirect()->route('playlists.show', $playlist)
+            ->with('success', 'Трек успешно удален из плейлиста!');
     }
 
     /**

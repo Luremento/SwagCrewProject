@@ -97,7 +97,7 @@ class TrackController extends Controller
             'size' => $audioFile->getSize(),
         ]);
 
-        return redirect()->route('profile.index', $track)
+        return redirect()->route('tracks.show', $track)
             ->with('success', 'Трек успешно загружен!');
     }
 
@@ -105,23 +105,23 @@ class TrackController extends Controller
     /**
      * Display the specified resource.
      */
-    // public function show(Track $track)
-    // {
-    //     $track->load(['user', 'genre']);
+    public function show(Track $track)
+    {
+        $track->load(['user', 'genre']);
 
-    //     // Получаем плейлисты пользователя
-    //     $playlists = Auth::check() ? Auth::user()->playlists()->withCount('tracks')->get() : collect([]);
+        // Получаем плейлисты пользователя
+        $playlists = Auth::check() ? Auth::user()->playlists()->withCount('tracks')->get() : collect([]);
 
-    //     // Получаем похожие треки (того же жанра)
-    //     $similarTracks = Track::where('genre_id', $track->genre_id)
-    //         ->where('id', '!=', $track->id)
-    //         ->with('user')
-    //         ->inRandomOrder()
-    //         ->limit(5)
-    //         ->get();
+        // Получаем похожие треки (того же жанра)
+        $similarTracks = Track::where('genre_id', $track->genre_id)
+            ->where('id', '!=', $track->id)
+            ->with('user')
+            ->inRandomOrder()
+            ->limit(5)
+            ->get();
 
-    //     return view('track.show', compact('track', 'playlists', 'similarTracks'));
-    // }
+        return view('track.show', compact('track', 'playlists', 'similarTracks'));
+    }
 
     public function getTrackData($id)
     {
@@ -130,6 +130,8 @@ class TrackController extends Controller
 
         // Получаем файлы напрямую из базы данных
         $file = \DB::table('files')->first();
+
+        // dd($file);
 
         // Формируем URL к аудиофайлу
         $audioUrl = null;
@@ -214,5 +216,107 @@ class TrackController extends Controller
             });
 
         return response()->json($genres);
+    }
+
+    public function softDelete(Track $track)
+    {
+        // Проверяем права доступа
+        if (Auth::user()->role !== 'admin' && Auth::id() !== $track->user_id) {
+            abort(403, 'У вас нет прав для удаления этого трека');
+        }
+
+        $trackTitle = $track->title;
+        $isAdmin = Auth::user()->role === 'admin';
+        $isOwner = Auth::id() === $track->user_id;
+
+        if ($isAdmin) {
+            // Администратор удаляет окончательно
+
+            // Проверяем, не удален ли уже трек мягко
+            if ($track->trashed()) {
+                // Если трек уже в корзине, удаляем окончательно
+                return $this->forceDelete($track->id);
+            }
+
+            // Удаляем связанные файлы
+            $files = $track->files;
+            foreach ($files as $file) {
+                if (Storage::disk('public')->exists($file->path)) {
+                    Storage::disk('public')->delete($file->path);
+                }
+            }
+
+            // Удаляем обложку
+            if ($track->cover_image && Storage::disk('public')->exists($track->cover_image)) {
+                Storage::disk('public')->delete($track->cover_image);
+            }
+
+            // Окончательное удаление
+            $track->forceDelete();
+
+            $message = $isOwner
+                ? "Ваш трек \"{$trackTitle}\" окончательно удален"
+                : "Трек \"{$trackTitle}\" окончательно удален администратором";
+
+        } else {
+            // Пользователь удаляет мягко
+
+            // Проверяем, не удален ли уже трек
+            if ($track->trashed()) {
+                return redirect()->back()->with('error', 'Трек уже в корзине');
+            }
+
+            $track->delete();
+
+            $message = "Ваш трек \"{$trackTitle}\" перемещен в корзину. Вы можете восстановить его в любое время.";
+        }
+
+        return redirect()->back()->with('success', $message);
+    }
+
+    public function restore($id)
+    {
+        // Только владелец трека может восстанавливать свои треки
+        $track = Track::withTrashed()->findOrFail($id);
+
+        if (Auth::id() !== $track->user_id) {
+            abort(403, 'У вас нет прав для восстановления этого трека');
+        }
+
+        if (!$track->trashed()) {
+            return redirect()->back()->with('error', 'Трек не удален');
+        }
+
+        $track->restore();
+
+        return redirect()->back()->with('success', "Ваш трек \"{$track->title}\" успешно восстановлен");
+    }
+
+    public function forceDelete($id)
+    {
+        // Только администраторы могут окончательно удалять треки
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'У вас нет прав для окончательного удаления треков');
+        }
+
+        $track = Track::withTrashed()->findOrFail($id);
+
+        // Удаляем связанные файлы
+        $files = $track->files;
+        foreach ($files as $file) {
+            if (Storage::disk('public')->exists($file->path)) {
+                Storage::disk('public')->delete($file->path);
+            }
+        }
+
+        // Удаляем обложку
+        if ($track->cover_image && Storage::disk('public')->exists($track->cover_image)) {
+            Storage::disk('public')->delete($track->cover_image);
+        }
+
+        $trackTitle = $track->title;
+        $track->forceDelete();
+
+        return redirect()->back()->with('success', "Трек \"{$trackTitle}\" окончательно удален");
     }
 }
