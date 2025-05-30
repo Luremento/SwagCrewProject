@@ -93,33 +93,52 @@
             <div class="ml-48 pb-6 pt-8">
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $user->name }}</h1>
                 <!-- <div class="mt-1 flex items-center">
-                    <span
-                        class="inline-flex items-center rounded-full bg-primary-600/90 px-3 py-1 text-sm font-medium text-white backdrop-blur-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Проверенный музыкант
-                    </span>
-                </div> -->
+                                            <span
+                                                class="inline-flex items-center rounded-full bg-primary-600/90 px-3 py-1 text-sm font-medium text-white backdrop-blur-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Проверенный музыкант
+                                            </span>
+                                        </div> -->
             </div>
 
             <!-- Кнопки действий -->
             @auth
                 <div class="absolute bottom-0 right-0 transform translate-y-1/2 px-8">
                     @if (auth()->id() === $user->id)
-                        <a href="{{ route('profile.edit') }}"
-                            class="group relative inline-flex overflow-hidden rounded-full bg-primary-600 px-6 py-3 font-medium text-white shadow-lg transition-all duration-300 hover:bg-primary-700">
-                            <span class="relative z-10 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                </svg>
-                                Редактировать профиль
-                            </span>
-                        </a>
+                        <div class="flex gap-4">
+                            {{-- Кнопка редактирования --}}
+                            <a href="{{ route('profile.edit') }}"
+                                class="group relative inline-flex overflow-hidden rounded-full bg-primary-600 px-6 py-3 font-medium text-white shadow-lg transition-all duration-300 hover:bg-primary-700">
+                                <span class="relative z-10 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                    Редактировать профиль
+                                </span>
+                            </a>
+
+                            {{-- Кнопка выхода --}}
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit"
+                                    class="group relative inline-flex overflow-hidden rounded-full bg-red-600 px-6 py-3 font-medium text-white shadow-lg transition-all duration-300 hover:bg-red-700">
+                                    <span class="relative z-10 flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 11-4 0v-1m0-8V7a2 2 0 114 0v1" />
+                                        </svg>
+                                        Выйти
+                                    </span>
+                                </button>
+                            </form>
+                        </div>
                     @else
                         <div class="flex space-x-3">
                             @if (Auth::user()->following->contains($user->id))

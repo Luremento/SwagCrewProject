@@ -70,11 +70,24 @@ class TrackController extends Controller
         // Валидация данных
         $validated = $request->validated();
 
+        // Обработка аудио файла
+        $audioFile = $request->file('audio_file');
+        $audioFileHash = md5_file($audioFile->getRealPath());
+
+        // Проверяем, существует ли уже такой файл
+        $existingFile = File::where('hash', $audioFileHash)->first();
+
+        if ($existingFile) {
+            // Файл уже существует, возвращаем ошибку
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['audio_file' => 'Этот аудиофайл уже загружен в систему.']);
+        }
+
         // Обработка жанра
         $genre = Genre::firstOrCreate(['name' => $validated['genre']]);
 
-        // Обработка аудио файла
-        $audioFile = $request->file('audio_file');
+        // Сохраняем аудио файл
         $audioFileName = Str::uuid() . '.' . $audioFile->getClientOriginalExtension();
         $audioPath = $audioFile->storeAs('tracks', $audioFileName, 'public');
 
@@ -91,18 +104,18 @@ class TrackController extends Controller
             'cover_image' => $coverPath,
         ]);
 
-        // Привязка файла к треку через полиморфную связь
+        // Привязка файла к треку
         $track->files()->create([
             'original_name' => $audioFile->getClientOriginalName(),
             'path' => $audioPath,
-            'hash' => md5_file($audioFile->getRealPath()),
+            'hash' => $audioFileHash,
             'size' => $audioFile->getSize(),
+            'fileable_type' => Track::class, // Добавляем тип модели
         ]);
 
         return redirect()->route('tracks.show', $track)
             ->with('success', 'Трек успешно загружен!');
     }
-
 
     /**
      * Display the specified resource.
@@ -122,22 +135,14 @@ class TrackController extends Controller
             ->limit(5)
             ->get();
 
-        // Получаем или создаем thread для трека
-        $thread = Thread::firstOrCreate([
-            'track_id' => $track->id
-        ], [
-            'title' => $track->title,
-            'user_id' => $track->user_id,
-            'category_id' => 1 // Добавьте ID категории по умолчанию для треков
-        ]);
-
-        // Получаем комментарии для трека через thread
-        $comments = Comment::where('thread_id', $thread->id)
+        // Получаем комментарии для трека напрямую, без thread
+        $comments = Comment::where('track_id', $track->id)
+            ->whereNull('thread_id')
             ->with(['user', 'files'])
             ->latest()
             ->get();
 
-        return view('track.show', compact('track', 'playlists', 'similarTracks', 'thread', 'comments'));
+        return view('track.show', compact('track', 'playlists', 'similarTracks', 'comments'));
     }
 
     public function getTrackData($id)
@@ -175,6 +180,66 @@ class TrackController extends Controller
         $track->increment('play_count');
 
         return response()->json(['success' => true, 'play_count' => $track->play_count]);
+    }
+
+    public function stream(Track $track)
+    {
+        $audioFile = $track->audioFile();
+
+        if (!$audioFile) {
+            abort(404, 'Аудио файл не найден');
+        }
+
+        $filePath = storage_path('app/public/' . $audioFile->path);
+
+        if (!file_exists($filePath)) {
+            abort(404, 'Файл не существует');
+        }
+
+        $fileSize = filesize($filePath);
+        $start = 0;
+        $end = $fileSize - 1;
+
+        // Обработка Range запросов для поддержки перематывания
+        if (isset($_SERVER['HTTP_RANGE'])) {
+            $range = $_SERVER['HTTP_RANGE'];
+            $ranges = explode('=', $range);
+            $offsets = explode('-', $ranges[1]);
+            $start = intval($offsets[0]);
+            if (isset($offsets[1]) && $offsets[1] !== '') {
+                $end = intval($offsets[1]);
+            }
+        }
+
+        $length = $end - $start + 1;
+
+        // Устанавливаем заголовки для потокового воспроизведения
+        $headers = [
+            'Content-Type' => 'audio/mpeg',
+            'Accept-Ranges' => 'bytes',
+            'Content-Length' => $length,
+            'Content-Range' => "bytes $start-$end/$fileSize",
+            'Cache-Control' => 'no-cache, must-revalidate',
+            'Pragma' => 'no-cache',
+        ];
+
+        // Возвращаем частичный контент
+        return response()->stream(function () use ($filePath, $start, $length) {
+            $handle = fopen($filePath, 'rb');
+            fseek($handle, $start);
+
+            $chunkSize = 8192; // 8KB chunks
+            $bytesRemaining = $length;
+
+            while ($bytesRemaining > 0 && !feof($handle)) {
+                $bytesToRead = min($chunkSize, $bytesRemaining);
+                echo fread($handle, $bytesToRead);
+                $bytesRemaining -= $bytesToRead;
+                flush();
+            }
+
+            fclose($handle);
+        }, isset($_SERVER['HTTP_RANGE']) ? 206 : 200, $headers);
     }
 
     /**

@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,7 +13,7 @@ return new class extends Migration
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('thread_id')->constrained('threads')->onDelete('cascade');
+            $table->foreignId('thread_id')->nullable()->constrained('threads')->onDelete('cascade');
             $table->foreignId('track_id')->nullable()->constrained()->onDelete('set null');
             $table->text('content')->nullable();
             $table->timestamps();

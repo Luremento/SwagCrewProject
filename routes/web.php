@@ -26,7 +26,7 @@ Route::middleware(CheckUserBlocked::class)->group(function () {
     });
     Route::post('/favorites/toggle/{track}', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
     Route::get('/forum', [ForumTopicController::class, 'index'])->name('forum.index');
-     Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
         Route::get('/thread/create', [ThreadController::class, 'create'])->name('thread.create');
         Route::post('/thread', [ThreadController::class, 'store'])->name('thread.store');
         Route::get('/thread/{thread}/edit', [ThreadController::class, 'edit'])->name('thread.edit');
@@ -63,6 +63,7 @@ Route::middleware(CheckUserBlocked::class)->group(function () {
             Route::get('/genres/search', 'searchGenres')->name('genres.search');
             Route::get('/tracks/{track}', 'show')->name('tracks.show');
             Route::post('/tracks/{id}/play', [TrackController::class, 'incrementPlayCount'])->name('tracks.play');
+            Route::get('/tracks/{track}/stream', [TrackController::class, 'stream'])->name('tracks.stream');
         });
 
 

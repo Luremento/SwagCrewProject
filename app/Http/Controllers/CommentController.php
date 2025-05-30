@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Comment;
 use App\Models\Thread;
+use App\Models\Track;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-
 
 class CommentController extends Controller
 {
@@ -16,20 +16,34 @@ class CommentController extends Controller
         // Валидация данных
         $validated = $request->validate([
             'content' => 'required|string|min:3',
-            'thread_id' => 'required|exists:threads,id',
+            'thread_id' => 'nullable|exists:threads,id',
             'track_id' => 'nullable|exists:tracks,id',
             'files.*' => 'nullable|file|max:10240|mimes:zip,rar,pdf,doc,docx,xls,xlsx,mp3,wav,jpg,jpeg,png,gif',
         ]);
 
+        // Проверяем, что указан либо thread_id, либо track_id, но не оба
+        if (empty($validated['thread_id']) && empty($validated['track_id'])) {
+            return redirect()->back()
+                ->withErrors(['error' => 'Необходимо указать либо тему, либо трек для комментария.']);
+        }
+
+        if (!empty($validated['thread_id']) && !empty($validated['track_id'])) {
+            return redirect()->back()
+                ->withErrors(['error' => 'Комментарий не может быть одновременно к теме и треку.']);
+        }
+
         // Создание комментария
         $comment = new Comment();
         $comment->content = $validated['content'];
-        $comment->thread_id = $validated['thread_id'];
         $comment->user_id = Auth::id();
 
-        // Прикрепление трека
-        if (!empty($validated['track_id'])) {
+        // Устанавливаем либо thread_id, либо track_id
+        if (!empty($validated['thread_id'])) {
+            $comment->thread_id = $validated['thread_id'];
+            $comment->track_id = null;
+        } else {
             $comment->track_id = $validated['track_id'];
+            $comment->thread_id = null;
         }
 
         $comment->save();
@@ -44,6 +58,7 @@ class CommentController extends Controller
                     'path' => $path,
                     'hash' => $file->hashName(),
                     'size' => $file->getSize(),
+                    'mime_type' => $file->getMimeType(),
                 ]);
             }
         }
@@ -64,23 +79,12 @@ class CommentController extends Controller
 
         $request->validate([
             'content' => 'required|string',
-            'track_id' => 'nullable|exists:tracks,id',
             'files.*' => 'nullable|file|max:10240', // 10MB max per file
-            'remove_track' => 'nullable|boolean',
             'remove_files' => 'nullable|string', // comma-separated file IDs
         ]);
 
         // Обновляем контент
         $comment->content = $request->content;
-
-        // Обработка трека
-        if ($request->remove_track == '1') {
-            // Удаляем трек
-            $comment->track_id = null;
-        } elseif ($request->track_id) {
-            // Устанавливаем новый трек
-            $comment->track_id = $request->track_id;
-        }
 
         // Обработка удаления файлов
         if ($request->remove_files) {
@@ -137,7 +141,9 @@ class CommentController extends Controller
         // Удаляем прикрепленные файлы
         if ($comment->files) {
             foreach ($comment->files as $file) {
-                Storage::delete($file->path);
+                if (Storage::disk('public')->exists($file->path)) {
+                    Storage::disk('public')->delete($file->path);
+                }
                 $file->delete();
             }
         }
@@ -146,5 +152,33 @@ class CommentController extends Controller
         $comment->delete();
 
         return redirect()->back()->with('success', 'Комментарий успешно удален');
+    }
+
+    /**
+     * Получить комментарии для темы
+     */
+    public function getThreadComments($threadId)
+    {
+        $comments = Comment::where('thread_id', $threadId)
+            ->whereNull('track_id')
+            ->with(['user', 'files'])
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return $comments;
+    }
+
+    /**
+     * Получить комментарии для трека
+     */
+    public function getTrackComments($trackId)
+    {
+        $comments = Comment::where('track_id', $trackId)
+            ->whereNull('thread_id')
+            ->with(['user', 'files'])
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return $comments;
     }
 }

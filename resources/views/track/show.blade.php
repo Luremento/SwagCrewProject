@@ -24,10 +24,10 @@
                             </div>
                         @endif
 
-                        <!-- Кнопка воспроизведения -->
+                        <!-- Кнопка воспроизведения на обложке -->
                         <div class="absolute inset-0 flex items-center justify-center">
                             <button
-                                class="play-button flex h-20 w-20 items-center justify-center rounded-full bg-white/90 shadow-lg transition-all hover:bg-white hover:scale-110"
+                                class="cover-play-button flex h-20 w-20 items-center justify-center rounded-full bg-white/90 shadow-lg transition-all hover:bg-white hover:scale-110"
                                 data-track-id="{{ $track->id }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-800" fill="currentColor"
                                     viewBox="0 0 24 24">
@@ -64,13 +64,72 @@
                             </span>
                         </div>
 
-                        <!-- Аудио плеер -->
+                        <!-- Кастомный аудио плеер -->
                         @if ($track->audioFile())
                             <div class="mb-6">
-                                <audio controls class="w-full">
-                                    <source src="{{ asset('storage/' . $track->audioFile()->path) }}" type="audio/mpeg">
-                                    Ваш браузер не поддерживает аудио элемент.
-                                </audio>
+                                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                                    <!-- Кастомный аудио плеер -->
+                                    <div class="audio-player" data-track-id="{{ $track->id }}">
+                                        <audio id="audio-{{ $track->id }}" preload="metadata" class="hidden">
+                                            <source src="{{ route('tracks.stream', $track->id) }}" type="audio/mpeg">
+                                            Ваш браузер не поддерживает аудио элемент.
+                                        </audio>
+
+                                        <!-- Контролы плеера -->
+                                        <div class="flex items-center space-x-4">
+                                            <!-- Кнопка воспроизведения -->
+                                            <button
+                                                class="play-pause-btn flex-shrink-0 w-12 h-12 bg-primary-600 hover:bg-primary-700 rounded-full flex items-center justify-center text-white transition-colors">
+                                                <svg class="play-icon w-5 h-5 ml-0.5" fill="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path d="M8 5v14l11-7z" />
+                                                </svg>
+                                                <svg class="pause-icon w-5 h-5 hidden" fill="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                                                </svg>
+                                            </button>
+
+                                            <!-- Прогресс бар -->
+                                            <div class="flex-1">
+                                                <div
+                                                    class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 mb-1">
+                                                    <span class="current-time">0:00</span>
+                                                    <span>/</span>
+                                                    <span class="duration">0:00</span>
+                                                </div>
+                                                <div
+                                                    class="progress-container relative h-2 bg-gray-200 dark:bg-gray-700 rounded-full cursor-pointer">
+                                                    <div class="progress-bar h-full bg-primary-600 rounded-full transition-all duration-150 relative z-10"
+                                                        style="width: 0%"></div>
+                                                    <div class="progress-handle absolute top-1/2 transform -translate-y-1/2 w-3 h-3 bg-primary-600 rounded-full shadow-md opacity-0 transition-opacity z-20"
+                                                        style="left: calc(0% - 6px)"></div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Громкость -->
+                                            <div class="flex items-center space-x-2">
+                                                <button
+                                                    class="volume-btn text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                                                    <svg class="volume-on w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                                        <path
+                                                            d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                                                    </svg>
+                                                    <svg class="volume-off w-5 h-5 hidden" fill="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path
+                                                            d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
+                                                    </svg>
+                                                </button>
+                                                <div class="volume-container relative">
+                                                    <input type="range"
+                                                        class="volume-slider w-20 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                                                        min="0" max="100" value="100">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         @endif
 
@@ -109,8 +168,8 @@
                             <!-- Поделиться -->
                             <button onclick="copyToClipboard('{{ route('tracks.show', $track->id) }}')"
                                 class="flex items-center space-x-2 rounded-lg bg-gray-50 px-4 py-2 text-gray-600 transition-colors hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                                 </svg>
@@ -133,7 +192,6 @@
                         <div class="border-b border-gray-200 p-6 dark:border-gray-700">
                             <form action="{{ route('comments.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
-                                <input type="hidden" name="thread_id" value="{{ $thread->id }}">
                                 <input type="hidden" name="track_id" value="{{ $track->id }}">
 
                                 <div class="flex space-x-4">
@@ -412,7 +470,7 @@
                                             @endif
                                         </div>
                                         <button
-                                            class="play-button absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 opacity-0 transition-all duration-200 group-hover:opacity-100"
+                                            class="similar-track-play-button absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 opacity-0 transition-all duration-200 group-hover:opacity-100"
                                             data-track-id="{{ $similarTrack->id }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white"
                                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -462,6 +520,60 @@
         </div>
     @endif
 
+    <style>
+        .volume-slider::-webkit-slider-thumb {
+            appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .volume-slider::-moz-range-thumb {
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .progress-container {
+            position: relative;
+        }
+
+        .progress-bar {
+            position: relative;
+            z-index: 10;
+        }
+
+        .progress-handle {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background: #3b82f6;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+
+        .progress-container:hover .progress-handle {
+            opacity: 1 !important;
+        }
+
+        .audio-player .progress-container:hover .progress-handle {
+            opacity: 1;
+        }
+    </style>
+
     <script>
         // Автоматически скрыть уведомление
         @if (session('success'))
@@ -507,13 +619,176 @@
             document.getElementById('edit-form-' + commentId).classList.add('hidden');
         }
 
-        // Обработчики кнопок воспроизведения
+        // Аудио плеер
         document.addEventListener('DOMContentLoaded', function() {
-            const playButtons = document.querySelectorAll('.play-button');
-            playButtons.forEach(button => {
+            const audioPlayer = document.querySelector('.audio-player[data-track-id="{{ $track->id }}"]');
+
+            if (audioPlayer) {
+                const audio = audioPlayer.querySelector('audio');
+                const playPauseBtn = audioPlayer.querySelector('.play-pause-btn');
+                const playIcon = audioPlayer.querySelector('.play-icon');
+                const pauseIcon = audioPlayer.querySelector('.pause-icon');
+                const progressContainer = audioPlayer.querySelector('.progress-container');
+                const progressBar = audioPlayer.querySelector('.progress-bar');
+                const progressHandle = audioPlayer.querySelector('.progress-handle');
+                const currentTimeSpan = audioPlayer.querySelector('.current-time');
+                const durationSpan = audioPlayer.querySelector('.duration');
+                const volumeBtn = audioPlayer.querySelector('.volume-btn');
+                const volumeSlider = audioPlayer.querySelector('.volume-slider');
+                const volumeOnIcon = audioPlayer.querySelector('.volume-on');
+                const volumeOffIcon = audioPlayer.querySelector('.volume-off');
+
+                let isDragging = false;
+
+                // Форматирование времени
+                function formatTime(seconds) {
+                    const mins = Math.floor(seconds / 60);
+                    const secs = Math.floor(seconds % 60);
+                    return `${mins}:${secs.toString().padStart(2, '0')}`;
+                }
+
+                // Обновление прогресса
+                function updateProgress() {
+                    if (!isDragging && audio.duration) {
+                        const progress = (audio.currentTime / audio.duration) * 100;
+                        progressBar.style.width = progress + '%';
+                        progressHandle.style.left = `calc(${progress}% - 6px)`;
+                        currentTimeSpan.textContent = formatTime(audio.currentTime);
+                    }
+                }
+
+                // Установка прогресса
+                function setProgress(e) {
+                    const rect = progressContainer.getBoundingClientRect();
+                    const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                    const time = percent * audio.duration;
+                    audio.currentTime = time;
+
+                    // Обновляем визуальный прогресс
+                    const progress = percent * 100;
+                    progressBar.style.width = progress + '%';
+                    progressHandle.style.left = `calc(${progress}% - 6px)`;
+
+                    // Увеличиваем счетчик прослушиваний при первом воспроизведении
+                    if (!audio.hasStartedPlaying) {
+                        fetch(`{{ route('tracks.play', $track->id) }}`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .getAttribute('content'),
+                                'Content-Type': 'application/json',
+                            },
+                        });
+                        audio.hasStartedPlaying = true;
+                    }
+                }
+
+                // События аудио
+                audio.addEventListener('loadedmetadata', function() {
+                    durationSpan.textContent = formatTime(audio.duration);
+                });
+
+                audio.addEventListener('timeupdate', updateProgress);
+
+                audio.addEventListener('ended', function() {
+                    playIcon.classList.remove('hidden');
+                    pauseIcon.classList.add('hidden');
+                    progressHandle.style.opacity = '0';
+                });
+
+                // Кнопка воспроизведения
+                playPauseBtn.addEventListener('click', function() {
+                    if (audio.paused) {
+                        audio.play();
+                        playIcon.classList.add('hidden');
+                        pauseIcon.classList.remove('hidden');
+                        progressHandle.style.opacity = '1';
+                    } else {
+                        audio.pause();
+                        playIcon.classList.remove('hidden');
+                        pauseIcon.classList.add('hidden');
+                        progressHandle.style.opacity = '0';
+                    }
+                });
+
+                // Прогресс бар
+                progressContainer.addEventListener('click', setProgress);
+
+                progressContainer.addEventListener('mousedown', function(e) {
+                    isDragging = true;
+                    setProgress(e);
+                    e.preventDefault();
+                });
+
+                document.addEventListener('mousemove', function(e) {
+                    if (isDragging) {
+                        setProgress(e);
+                    }
+                });
+
+                document.addEventListener('mouseup', function() {
+                    isDragging = false;
+                });
+
+                // Показать ползунок при наведении
+                progressContainer.addEventListener('mouseenter', function() {
+                    if (!audio.paused) {
+                        progressHandle.style.opacity = '1';
+                    }
+                });
+
+                progressContainer.addEventListener('mouseleave', function() {
+                    if (!isDragging && !audio.paused) {
+                        progressHandle.style.opacity = '0';
+                    }
+                });
+
+                // Громкость
+                volumeBtn.addEventListener('click', function() {
+                    if (audio.muted) {
+                        audio.muted = false;
+                        volumeOnIcon.classList.remove('hidden');
+                        volumeOffIcon.classList.add('hidden');
+                        volumeSlider.value = audio.volume * 100;
+                    } else {
+                        audio.muted = true;
+                        volumeOnIcon.classList.add('hidden');
+                        volumeOffIcon.classList.remove('hidden');
+                    }
+                });
+
+                volumeSlider.addEventListener('input', function() {
+                    audio.volume = this.value / 100;
+                    audio.muted = this.value == 0;
+
+                    if (audio.muted) {
+                        volumeOnIcon.classList.add('hidden');
+                        volumeOffIcon.classList.remove('hidden');
+                    } else {
+                        volumeOnIcon.classList.remove('hidden');
+                        volumeOffIcon.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Кнопка воспроизведения на обложке
+            const coverPlayButton = document.querySelector('.cover-play-button');
+            if (coverPlayButton) {
+                coverPlayButton.addEventListener('click', function() {
+                    const audio = document.querySelector('#audio-{{ $track->id }}');
+                    const playPauseBtn = document.querySelector('.play-pause-btn');
+                    if (audio && playPauseBtn) {
+                        playPauseBtn.click();
+                    }
+                });
+            }
+
+        // Кнопки воспроизведения похожих треков
+        const similarTrackButtons = document.querySelectorAll('.similar-track-play-button');
+            similarTrackButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const trackId = this.getAttribute('data-track-id');
-                    console.log('Play track:', trackId);
+                    window.location.href = `/tracks/${trackId}`;
                 });
             });
 
