@@ -26,12 +26,14 @@ Route::middleware(CheckUserBlocked::class)->group(function () {
     });
     Route::post('/favorites/toggle/{track}', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
     Route::get('/forum', [ForumTopicController::class, 'index'])->name('forum.index');
-    Route::get('/thread/create', [ThreadController::class, 'create'])->name('thread.create');
-    Route::post('/thread', [ThreadController::class, 'store'])->name('thread.store');
+     Route::middleware('auth')->group(function () {
+        Route::get('/thread/create', [ThreadController::class, 'create'])->name('thread.create');
+        Route::post('/thread', [ThreadController::class, 'store'])->name('thread.store');
+        Route::get('/thread/{thread}/edit', [ThreadController::class, 'edit'])->name('thread.edit');
+        Route::put('/thread/{id}', [App\Http\Controllers\ThreadController::class, 'update'])->name('thread.update');
+        Route::delete('/thread/{id}', [App\Http\Controllers\ThreadController::class, 'destroy'])->name('thread.destroy');
+    });
     Route::get('/thread/{thread}', [ThreadController::class, 'show'])->name('thread.show');
-    Route::get('/thread/{thread}/edit', [ThreadController::class, 'edit'])->name('thread.edit');
-    Route::put('/thread/{id}', [App\Http\Controllers\ThreadController::class, 'update'])->name('thread.update');
-    Route::delete('/thread/{id}', [App\Http\Controllers\ThreadController::class, 'destroy'])->name('thread.destroy');
 
 
     Route::get('/tracks', [TrackController::class, 'index'])->name('tracks.index');

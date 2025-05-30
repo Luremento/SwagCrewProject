@@ -90,9 +90,9 @@
             </div>
 
             <!-- Информация о пользователе -->
-            {{-- <div class="ml-48 pb-6 pt-8">
+            <div class="ml-48 pb-6 pt-8">
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $user->name }}</h1>
-                <div class="mt-1 flex items-center">
+                <!-- <div class="mt-1 flex items-center">
                     <span
                         class="inline-flex items-center rounded-full bg-primary-600/90 px-3 py-1 text-sm font-medium text-white backdrop-blur-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24"
@@ -102,8 +102,8 @@
                         </svg>
                         Проверенный музыкант
                     </span>
-                </div>
-            </div> --}}
+                </div> -->
+            </div>
 
             <!-- Кнопки действий -->
             @auth
