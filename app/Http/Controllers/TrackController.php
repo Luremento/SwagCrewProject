@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
 use App\Models\File;
 use App\Models\Genre;
+use App\Models\Thread;
 use App\Models\Track;
 use App\Models\Playlist;
 use Illuminate\Http\Request;
@@ -120,7 +122,22 @@ class TrackController extends Controller
             ->limit(5)
             ->get();
 
-        return view('track.show', compact('track', 'playlists', 'similarTracks'));
+        // Получаем или создаем thread для трека
+        $thread = Thread::firstOrCreate([
+            'track_id' => $track->id
+        ], [
+            'title' => $track->title,
+            'user_id' => $track->user_id,
+            'category_id' => 1 // Добавьте ID категории по умолчанию для треков
+        ]);
+
+        // Получаем комментарии для трека через thread
+        $comments = Comment::where('thread_id', $thread->id)
+            ->with(['user', 'files'])
+            ->latest()
+            ->get();
+
+        return view('track.show', compact('track', 'playlists', 'similarTracks', 'thread', 'comments'));
     }
 
     public function getTrackData($id)

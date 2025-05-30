@@ -42,6 +42,11 @@ class Track extends Model
         return $this->files()->where('path', 'like', 'tracks/%')->first();
     }
 
+    public function comments()
+    {
+        return $this->hasMany(Comment::class)->latest();
+    }
+
     /**
      * Получить жанр трека
      */
