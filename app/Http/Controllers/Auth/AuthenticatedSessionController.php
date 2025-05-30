@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -43,5 +45,35 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    public function yandex(): RedirectResponse
+    {
+        return Socialite::driver('yandex')->redirect();
+    }
+
+    public function yandexRedirect(): RedirectResponse
+    {
+        try {
+            $user = Socialite::driver('yandex')->user();
+
+            $existingUser = User::where('email', $user->email)->first();
+
+            if (!$existingUser) {
+                $newUser = User::create([
+                    'name' => $user->name ?? $user->nickname,
+                    'email' => $user->email,
+                ]);
+
+                Auth::login($newUser, true); // Второй параметр "remember" = true
+                return redirect()->intended(route('profile.index'));
+            } else {
+                Auth::login($existingUser, true);
+                return redirect()->intended(route('profile.index'));
+            }
+        } catch (\Exception $e) {
+            logger()->error('Yandex auth error: ' . $e->getMessage());
+            return redirect(route('login'))->with('error', 'Ошибка входа через Yandex');
+        }
     }
 }

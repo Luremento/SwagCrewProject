@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->enum('role', ['admin', 'user'])->default('user');
             $table->boolean('is_blocked')->default(false);
             $table->text('bio')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

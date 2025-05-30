@@ -107,7 +107,7 @@
                     </div>
 
                     <div class="mt-6">
-                        <a href="/"
+                        <a href="{{ route('yandex') }}"
                             class="inline-flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
                             <svg class="mr-2 h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M2.04883 9.80645H21.9512V14.1935H2.04883V9.80645Z" fill="#FC3F1D" />
