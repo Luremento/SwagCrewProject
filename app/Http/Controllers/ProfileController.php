@@ -137,7 +137,7 @@ class ProfileController extends Controller
         $user->avatar = $avatarName;
         $user->save();
 
-        return redirect()->route('profile.edit')->with('status', 'Аватар успешно обновлен!');
+        return redirect()->route('profile.index')->with('status', 'Аватар успешно обновлен!');
     }
 
     /**
