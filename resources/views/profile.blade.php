@@ -421,10 +421,10 @@
                                 <div class="flex-1">
                                     <div class="mb-4 flex flex-wrap items-start justify-between gap-2">
                                         <div>
-                                            <h3
-                                                class="text-2xl font-bold text-gray-900 dark:text-white {{ $track->trashed() ? 'line-through' : '' }}">
+                                           <a href="{{ route('tracks.show', $track->id) }}"
+                                                class="truncate text-2xl font-medium text-gray-900 hover:text-primary-600 dark:text-white dark:hover:text-primary-400">
                                                 {{ $track->title }}
-                                            </h3>
+                                            </a>
                                             @if ($track->trashed())
                                                 <span
                                                     class="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800 dark:bg-red-900/30 dark:text-red-300 mt-1">
