@@ -114,7 +114,7 @@
                     </div>
                 </div>
 
-                <!-- Статистика -->
+                {{-- <!-- Статистика -->
                 <div class="mt-16 grid grid-cols-2 gap-8 border-t border-white/20 pt-10 sm:grid-cols-4">
                     <div class="text-center">
                         <div class="text-3xl font-bold text-white">10K+</div>
@@ -132,7 +132,7 @@
                         <div class="text-3xl font-bold text-white">5K+</div>
                         <div class="mt-2 text-sm text-white/70">Обсуждений</div>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>

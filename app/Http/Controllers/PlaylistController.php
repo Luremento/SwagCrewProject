@@ -192,7 +192,7 @@ class PlaylistController extends Controller
     {
         // Проверяем, что пользователь является владельцем плейлиста
         if ($playlist->user_id !== Auth::id()) {
-            return response()->json(['error' => 'У вас нет прав на удаление этого плейлиста'], 403);
+            return redirect()->route('index')->with('success', 'Плейлист успешно удален!');
         }
 
         // Удаляем обложку, если она есть
@@ -202,7 +202,7 @@ class PlaylistController extends Controller
 
         $playlist->delete();
 
-        return response()->json(['message' => 'Плейлист успешно удален']);
+        return redirect()->route('index')->with('success', 'Плейлист успешно удален!');
     }
 
     /**

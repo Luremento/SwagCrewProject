@@ -93,33 +93,19 @@
                     </svg>
                 </button>
 
-                <!-- Кнопки авторизации -->
+                <!-- Кнопки авторизации для десктопа -->
                 @guest
                     <a href="{{ route('login') }}"
                         class="hidden rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 sm:block">
                         Войти
                     </a>
                     <a href="{{ route('register') }}"
-                        class="rounded-full bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-800">
+                        class="hidden sm:block rounded-full bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-800">
                         Регистрация
                     </a>
                 @else
-                    <!-- Уведомления -->
-                    {{-- <div class="relative">
-                        <button
-                            class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                            </svg>
-                            <span
-                                class="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary-600 text-xs font-bold text-white">3</span>
-                        </button>
-                    </div> --}}
-
                     <!-- Профиль пользователя -->
-                    <div class="relative">
+                    <div class="relative hidden md:block">
                         <a href="{{ route('profile.index') }}">
                             <button
                                 class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
@@ -136,75 +122,183 @@
 
                     <!-- Кнопка загрузки трека -->
                     <a href="{{ route('track.create') }}"
-                        class="rounded-full bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-800">
-                        <span class="hidden sm:inline">Загрузить трек</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:hidden" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
+                        class="hidden sm:block rounded-full bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-800">
+                        Загрузить трек
                     </a>
                 @endguest
 
-                <!-- Мобильное меню -->
-                <button
+                <!-- Кнопка мобильного меню -->
+                <button id="mobile-menu-button"
                     class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 md:hidden">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
+                    <svg id="hamburger-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <svg id="close-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- Мобильное меню -->
+    <div id="mobile-menu"
+        class="hidden md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+        <div class="container mx-auto px-4 py-4">
+            <!-- Поиск в мобильном меню -->
+            <div class="mb-4">
+                <form action="{{ route('search.index') }}" method="GET">
+                    <div class="relative">
+                        <input type="text" name="q" value="{{ request('q') }}" placeholder="Поиск..."
+                            class="w-full rounded-full border-none bg-gray-100 pl-10 pr-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:text-gray-300 dark:placeholder-gray-500">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-400"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Навигация -->
+            <nav class="space-y-2">
+                <a href="{{ route('index') }}"
+                    class="block rounded-lg px-3 py-2 text-base font-medium {{ request()->routeIs('index') ? 'bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800' }}">
+                    Главная
+                </a>
+
+                <a href="{{ route('tracks.index') }}"
+                    class="block rounded-lg px-3 py-2 text-base font-medium {{ request()->routeIs('tracks.index') ? 'bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800' }}">
+                    Треки
+                </a>
+
+                <a href="{{ route('forum.index') }}"
+                    class="block rounded-lg px-3 py-2 text-base font-medium {{ request()->routeIs('forum.index') ? 'bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800' }}">
+                    Форум
+                </a>
+
+                @if (Auth::user() && Auth::user()->role == 'admin')
+                    <a href="{{ route('admin.dashboard') }}"
+                        class="block rounded-lg px-3 py-2 text-base font-medium {{ request()->routeIs('admin.dashboard') ? 'bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800' }}">
+                        Панель администратора
+                    </a>
+                @endif
+            </nav>
+
+            <!-- Разделитель -->
+            <div class="my-4 border-t border-gray-200 dark:border-gray-700"></div>
+
+            <!-- Пользовательские действия -->
+            @guest
+                <div class="space-y-2">
+                    <a href="{{ route('login') }}"
+                        class="block rounded-lg bg-gray-100 px-3 py-2 text-center text-base font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
+                        Войти
+                    </a>
+                    <a href="{{ route('register') }}"
+                        class="block rounded-lg bg-primary-600 px-3 py-2 text-center text-base font-medium text-white hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-800">
+                        Регистрация
+                    </a>
+                </div>
+            @else
+                <div class="space-y-2">
+                    <!-- Профиль пользователя в мобильном меню -->
+                    <a href="{{ route('profile.index') }}"
+                        class="flex items-center rounded-lg px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
+                        <div
+                            class="mr-3 flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                            @if (Auth::check() && Auth::user()->avatar)
+                                <img src="{{ asset('storage/avatars/' . Auth::user()->avatar) }}" alt="Аватар"
+                                    class="h-full w-full object-cover">
+                            @else
+                                <img src="{{ asset('img/default-avatar.webp') }}" alt="Аватар"
+                                    class="h-full w-full object-cover">
+                            @endif
+                        </div>
+                        Мой профиль
+                    </a>
+
+                    <a href="{{ route('track.create') }}"
+                        class="block rounded-lg bg-primary-600 px-3 py-2 text-center text-base font-medium text-white hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-800">
+                        Загрузить трек
+                    </a>
+
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit"
+                            class="block w-full rounded-lg px-3 py-2 text-left text-base font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20">
+                            Выйти
+                        </button>
+                    </form>
+                </div>
+            @endguest
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Поиск функциональность
             const searchInput = document.getElementById('searchInput');
             const searchSuggestions = document.getElementById('searchSuggestions');
             const suggestionsList = document.getElementById('suggestionsList');
             const searchForm = document.getElementById('searchForm');
             let searchTimeout;
 
-            // Показать/скрыть предложения
-            searchInput.addEventListener('focus', function() {
-                if (this.value.length >= 2) {
-                    searchSuggestions.classList.remove('hidden');
-                }
-            });
+            if (searchInput) {
+                // Показать/скрыть предложения
+                searchInput.addEventListener('focus', function() {
+                    if (this.value.length >= 2) {
+                        searchSuggestions.classList.remove('hidden');
+                    }
+                });
 
-            // Поиск предложений при вводе
-            searchInput.addEventListener('input', function() {
-                const query = this.value.trim();
+                // Поиск предложений при вводе
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.trim();
 
-                clearTimeout(searchTimeout);
+                    clearTimeout(searchTimeout);
 
-                if (query.length < 2) {
-                    searchSuggestions.classList.add('hidden');
-                    return;
-                }
+                    if (query.length < 2) {
+                        searchSuggestions.classList.add('hidden');
+                        return;
+                    }
 
-                searchTimeout = setTimeout(() => {
-                    fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            suggestionsList.innerHTML = '';
+                    searchTimeout = setTimeout(() => {
+                        fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                suggestionsList.innerHTML = '';
 
-                            if (data.length > 0) {
-                                data.forEach(item => {
-                                    const suggestionItem = createSuggestionItem(item);
-                                    suggestionsList.appendChild(suggestionItem);
-                                });
-                                searchSuggestions.classList.remove('hidden');
-                            } else {
-                                searchSuggestions.classList.add('hidden');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Ошибка поиска:', error);
-                        });
-                }, 300);
-            });
+                                if (data.length > 0) {
+                                    data.forEach(item => {
+                                        const suggestionItem = createSuggestionItem(
+                                            item);
+                                        suggestionsList.appendChild(suggestionItem);
+                                    });
+                                    searchSuggestions.classList.remove('hidden');
+                                } else {
+                                    searchSuggestions.classList.add('hidden');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Ошибка поиска:', error);
+                            });
+                    }, 300);
+                });
+
+                // Отправка формы по Enter
+                searchInput.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter') {
+                        searchSuggestions.classList.add('hidden');
+                    }
+                });
+            }
 
             // Создание элемента предложения
             function createSuggestionItem(item) {
@@ -237,17 +331,58 @@
 
             // Скрыть предложения при клике вне
             document.addEventListener('click', function(event) {
-                if (!document.getElementById('searchContainer').contains(event.target)) {
+                const searchContainer = document.getElementById('searchContainer');
+                if (searchContainer && !searchContainer.contains(event.target)) {
                     searchSuggestions.classList.add('hidden');
                 }
             });
 
-            // Отправка формы по Enter
-            searchInput.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter') {
-                    searchSuggestions.classList.add('hidden');
-                }
-            });
+            // Мобильное меню
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const hamburgerIcon = document.getElementById('hamburger-icon');
+            const closeIcon = document.getElementById('close-icon');
+
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', function() {
+                    const isHidden = mobileMenu.classList.contains('hidden');
+
+                    if (isHidden) {
+                        // Открыть меню
+                        mobileMenu.classList.remove('hidden');
+                        hamburgerIcon.classList.add('hidden');
+                        closeIcon.classList.remove('hidden');
+                        document.body.style.overflow = 'hidden'; // Предотвратить скролл
+                    } else {
+                        // Закрыть меню
+                        mobileMenu.classList.add('hidden');
+                        hamburgerIcon.classList.remove('hidden');
+                        closeIcon.classList.add('hidden');
+                        document.body.style.overflow = ''; // Восстановить скролл
+                    }
+                });
+
+                // Закрыть меню при клике на ссылку
+                const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+                mobileMenuLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        mobileMenu.classList.add('hidden');
+                        hamburgerIcon.classList.remove('hidden');
+                        closeIcon.classList.add('hidden');
+                        document.body.style.overflow = '';
+                    });
+                });
+
+                // Закрыть меню при изменении размера экрана
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth >= 768) { // md breakpoint
+                        mobileMenu.classList.add('hidden');
+                        hamburgerIcon.classList.remove('hidden');
+                        closeIcon.classList.add('hidden');
+                        document.body.style.overflow = '';
+                    }
+                });
+            }
         });
     </script>
 </header>

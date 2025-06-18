@@ -12,6 +12,7 @@ use App\Http\Controllers\{
     PlaylistController
 };
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Middleware\{IsAdmin, CheckUserBlocked};
 use Illuminate\Support\Facades\Route;
@@ -92,6 +93,9 @@ Route::middleware(CheckUserBlocked::class)->group(function () {
             // Управление пользователями
             Route::post('/users/{user}/toggle-role', [AdminController::class, 'toggleUserRole'])->name('users.toggle-role');
             Route::post('/users/{user}/toggle-block', [AdminController::class, 'toggleUserBlock'])->name('users.toggle-block');
+
+            // Управление категориями
+            Route::resource('categories', CategoryController::class);
 
             // Экспорт
             Route::get('/export/users/excel', [AdminController::class, 'exportUsersExcel'])->name('export.users.excel');

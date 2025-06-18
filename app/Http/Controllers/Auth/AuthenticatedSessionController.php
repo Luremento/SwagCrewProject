@@ -52,7 +52,7 @@ class AuthenticatedSessionController extends Controller
         return Socialite::driver('yandex')->redirect();
     }
 
-    public function yandexRedirect(): RedirectResponse
+    public function yandexRedirect()
     {
         try {
             $user = Socialite::driver('yandex')->user();
@@ -64,8 +64,7 @@ class AuthenticatedSessionController extends Controller
                     'name' => $user->name ?? $user->nickname,
                     'email' => $user->email,
                 ]);
-
-                Auth::login($newUser, true); // Второй параметр "remember" = true
+                Auth::login($newUser, true);
                 return redirect()->intended(route('profile.index'));
             } else {
                 Auth::login($existingUser, true);
